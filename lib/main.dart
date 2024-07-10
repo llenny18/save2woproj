@@ -190,7 +190,7 @@ class __FormContentState extends State<_FormContent> {
                   if (_formKey.currentState?.validate() ?? false) {
                     Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => const SecondRoute()),
+    MaterialPageRoute(builder: (context) =>  ResponsiveNavBarPage()),
   );
                   }
                 },
@@ -219,7 +219,7 @@ class ResponsiveNavBarPage extends StatelessWidget {
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+                    backgroundColor: const Color(0xff088294),
           elevation: 0,
           titleSpacing: 0,
           leading: isLargeScreen
@@ -233,11 +233,27 @@ class ResponsiveNavBarPage extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  "Logo",
-                  style: TextStyle(
-                      color: Colors.green, fontWeight: FontWeight.bold),
+                Align(
+          alignment: Alignment.bottomCenter,
+          child: SizedBox(
+            width: 40,
+            height: 40,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    image:  DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage('assets/save2wo.png'),
+                    ),
+                  ),
                 ),
+              ],
+            ),
+          ),
+        ),
                 if (isLargeScreen) Expanded(child: _navBarItems())
               ],
             ),
@@ -250,7 +266,9 @@ class ResponsiveNavBarPage extends StatelessWidget {
           ],
         ),
         drawer: isLargeScreen ? null : _drawer(),
-        body: const Center(
+          backgroundColor: const Color(0xffeaf4f7),
+        body: 
+        const Center(
           child: Text(
             "Body",
           ),
