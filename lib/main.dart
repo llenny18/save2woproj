@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const Home());
 }
 
-
-
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Home extends StatelessWidget {
+  const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +67,7 @@ class _Logo extends StatelessWidget {
                 Container(
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    image:  DecorationImage(
+                    image: DecorationImage(
                       fit: BoxFit.cover,
                       image: NetworkImage('assets/save2wo.png'),
                     ),
@@ -177,21 +175,25 @@ class __FormContentState extends State<_FormContent> {
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4)),
-                      backgroundColor: const Color(0xff108494),
+                  backgroundColor: const Color(0xff108494),
                 ),
                 child: const Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(
                     'Sign in',
-                    style: TextStyle(color: Colors.white,fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
                 onPressed: () {
                   if (_formKey.currentState?.validate() ?? false) {
                     Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) =>  ResponsiveNavBarPage()),
-  );
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Dashboard()),
+                    );
                   }
                 },
               ),
@@ -204,8 +206,9 @@ class __FormContentState extends State<_FormContent> {
 
   Widget _gap() => const SizedBox(height: 16);
 }
-class ResponsiveNavBarPage extends StatelessWidget {
-  ResponsiveNavBarPage({Key? key}) : super(key: key);
+
+class Dashboard extends StatelessWidget {
+  Dashboard({Key? key}) : super(key: key);
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -219,7 +222,7 @@ class ResponsiveNavBarPage extends StatelessWidget {
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-                    backgroundColor: const Color(0xff088294),
+          backgroundColor: const Color(0xff088294),
           elevation: 0,
           titleSpacing: 0,
           leading: isLargeScreen
@@ -234,26 +237,26 @@ class ResponsiveNavBarPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Align(
-          alignment: Alignment.bottomCenter,
-          child: SizedBox(
-            width: 40,
-            height: 40,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Container(
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    image:  DecorationImage(
-                      fit: BoxFit.cover,
-                      image: NetworkImage('assets/save2wo.png'),
+                  alignment: Alignment.bottomCenter,
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Container(
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: NetworkImage('assets/save2wo.png'),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
                 if (isLargeScreen) Expanded(child: _navBarItems())
               ],
             ),
@@ -265,30 +268,38 @@ class ResponsiveNavBarPage extends StatelessWidget {
             )
           ],
         ),
-        drawer: isLargeScreen ? null : _drawer(),
-          backgroundColor: const Color(0xffeaf4f7),
-        body: 
-        const Center(
-          child: Text(
-            "Body",
-          ),
+        drawer: isLargeScreen ? null : _drawer(context),
+        backgroundColor: const Color(0xffeaf4f7),
+        body: Center(
+          child: 
+            CarouselDemo(),
+          
         ),
       ),
     );
   }
 
-  Widget _drawer() => Drawer(
-        child: ListView(
-          children: _menuItems
-              .map((item) => ListTile(
-                    onTap: () {
-                      _scaffoldKey.currentState?.openEndDrawer();
-                    },
-                    title: Text(item),
-                  ))
-              .toList(),
-        ),
-      );
+Widget _drawer(BuildContext context) => Drawer(
+      child: ListView(
+        children: _menuItems.map((item) {
+          return ListTile(
+            onTap: () {
+             
+              Navigator.of(context).pop();
+
+                if (item == "Sign Out") {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Home()),
+                  );
+                }
+            },
+            title: Text(item),
+          );
+        }).toList(),
+      ),
+    );
 
   Widget _navBarItems() => Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -346,7 +357,6 @@ class _ProfileIcon extends StatelessWidget {
   }
 }
 
-
 class SecondRoute extends StatelessWidget {
   const SecondRoute({super.key});
 
@@ -357,15 +367,51 @@ class SecondRoute extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Second Route'),
       ),
-      drawer: (screenWidth > 800) ? null : ResponsiveNavBarPage()._drawer(),
+      drawer: (screenWidth > 800) ? null : Dashboard()._drawer(context),
       body: const Center(
-        
-          child:  Text('Go back!s'),
-          
-        
+        child: Text('Go back!s'),
       ),
     );
   }
 }
 
 
+
+class CarouselDemo extends StatelessWidget {
+  final List<String> imgList = [
+    'https://www.aqueon.com/-/media/project/oneweb/aqueon/us/blog/ways-to-know-your-fish-are-happy/fish-are-happy-and-healthy-1.png',
+    'https://c02.purpledshub.com/uploads/sites/62/2022/09/GettyImages-200386624-001-d80a3ec.jpg?w=1029&webp=1',
+    'https://i.natgeofe.com/n/633757ae-c0c5-43e6-a1fe-11342b9b4b72/fish-hero_2x3.jpg',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        backgroundColor: const Color(0xffeaf4f7),
+      
+      body: 
+      Center(
+        child: CarouselSlider(
+          options: CarouselOptions(
+            height: 400,
+            aspectRatio: 16/9,
+            viewportFraction: 0.8,
+            initialPage: 0,
+            enableInfiniteScroll: true,
+            reverse: false,
+            autoPlay: true,
+            autoPlayInterval: Duration(seconds: 3),
+            autoPlayAnimationDuration: Duration(milliseconds: 800),
+            enlargeCenterPage: true,
+            scrollDirection: Axis.horizontal,
+          ),
+          items: imgList.map((item) => Container(
+            child: Center(
+              child: Image.network(item, fit: BoxFit.cover, width: 1000)
+            ),
+          )).toList(),
+        ),
+      ),
+    );
+  }
+}
