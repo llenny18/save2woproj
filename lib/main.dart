@@ -278,6 +278,10 @@ class Dashboard extends StatelessWidget {
       ),
     );
   }
+}
+
+
+  
 Widget _drawer(BuildContext context) => Drawer(
         child: ListView(
           children: _menuItems.map((item) {
@@ -299,6 +303,12 @@ Widget _drawer(BuildContext context) => Drawer(
                                 MaterialPageRoute(builder: (context) => Home()),
                               );
                             }
+                            else if (item == "History") {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => HistoryTab()),
+                              );
+                            }
                           },
                         ),
                       ],
@@ -312,7 +322,7 @@ Widget _drawer(BuildContext context) => Drawer(
         ),
       );
 
-  final List<String> _menuItems = ['Home', 'Profile', 'Settings', 'Logout'];
+  final List<String> _menuItems = ['Home', 'Profile', 'History', 'Logout'];
 
 
   Widget _navBarItems(BuildContext context) => Row(
@@ -338,6 +348,12 @@ Widget _drawer(BuildContext context) => Drawer(
                                 MaterialPageRoute(builder: (context) => Home()),
                               );
                             }
+                            else if (item == "History") {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => HistoryTab()),
+                              );
+                            }
                           },
                         ),
                       ],
@@ -357,14 +373,9 @@ Widget _drawer(BuildContext context) => Drawer(
             )
             .toList(),
       );
-}
 
-final List<String> _menuItems = <String>[
-  'About',
-  'Contact',
-  'Settings',
-  'Logout',
-];
+
+
 
 enum Menu { itemOne, itemTwo, itemThree }
 
@@ -404,7 +415,7 @@ class SecondRoute extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Second Route'),
       ),
-      drawer: (screenWidth > 800) ? null : Dashboard()._drawer(context),
+      drawer: (screenWidth > 800) ? null : _drawer(context),
       body: const Center(
         child: Text('Go back!s'),
       ),
@@ -447,6 +458,117 @@ class CarouselDemo extends StatelessWidget {
               child: Image.network(item, fit: BoxFit.cover, width: 1000)
             ),
           )).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+
+
+
+class HistoryTab extends StatelessWidget {
+  HistoryTab({Key? key}) : super(key: key);
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final bool isLargeScreen = width > 800;
+
+    return Theme(
+      data: ThemeData.dark(),
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          backgroundColor: const Color(0xff088294),
+          elevation: 0,
+          titleSpacing: 0,
+          leading: isLargeScreen
+              ? null
+              : IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                ),
+          title: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Container(
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: NetworkImage('assets/save2wo.png'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (isLargeScreen) Expanded(child: _navBarItems(context))
+              ],
+            ),
+          ),
+          actions: const [
+            Padding(
+              padding: EdgeInsets.only(right: 16.0),
+              child: CircleAvatar(child: _ProfileIcon()),
+            )
+          ],
+        ),
+        drawer: isLargeScreen ? null : _drawer(context),
+        backgroundColor: const Color(0xffeaf4f7),
+        
+        body:
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(15.0),
+            child: History(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+class History extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: DataTable(
+        columns: const <DataColumn>[
+          DataColumn(
+            label: Text('Name', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+          ),
+          DataColumn(
+            label: Text('Age', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+          ),
+          DataColumn(
+            label: Text('City', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+          ),
+        ],
+        rows: List<DataRow>.generate(
+          20,
+          (index) => DataRow(
+            cells: <DataCell>[
+              DataCell(Text('Name ${index + 1}', style: const TextStyle( color: Colors.black))),
+              DataCell(Text('${20 + index}', style: const TextStyle( color: Colors.black))),
+              DataCell(Text('City ${index % 5}', style: const TextStyle( color: Colors.black))),
+            ],
+          ),
         ),
       ),
     );
