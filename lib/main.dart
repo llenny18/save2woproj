@@ -257,7 +257,7 @@ class Dashboard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (isLargeScreen) Expanded(child: _navBarItems())
+                if (isLargeScreen) Expanded(child: _navBarItems(context))
               ],
             ),
           ),
@@ -278,36 +278,73 @@ class Dashboard extends StatelessWidget {
       ),
     );
   }
-
 Widget _drawer(BuildContext context) => Drawer(
-      child: ListView(
-        children: _menuItems.map((item) {
-          return ListTile(
-            onTap: () {
-             
-              Navigator.of(context).pop();
+        child: ListView(
+          children: _menuItems.map((item) {
+            return ListTile(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Tapped on $item'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text('OK'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            if (item == "Logout") {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => Home()),
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              title: Text(item),
+            );
+          }).toList(),
+        ),
+      );
 
-                if (item == "Sign Out") {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const Home()),
-                  );
-                }
-            },
-            title: Text(item),
-          );
-        }).toList(),
-      ),
-    );
+  final List<String> _menuItems = ['Home', 'Profile', 'Settings', 'Logout'];
 
-  Widget _navBarItems() => Row(
+
+  Widget _navBarItems(BuildContext context) => Row(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: _menuItems
             .map(
               (item) => InkWell(
-                onTap: () {},
+                onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Tapped on $item'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text('OK'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            if (item == "Logout") {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => Home()),
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       vertical: 24.0, horizontal: 16),
@@ -326,7 +363,7 @@ final List<String> _menuItems = <String>[
   'About',
   'Contact',
   'Settings',
-  'Sign Out',
+  'Logout',
 ];
 
 enum Menu { itemOne, itemTwo, itemThree }
@@ -351,7 +388,7 @@ class _ProfileIcon extends StatelessWidget {
               ),
               const PopupMenuItem<Menu>(
                 value: Menu.itemThree,
-                child: Text('Sign Out'),
+                child: Text('Logout'),
               ),
             ]);
   }
