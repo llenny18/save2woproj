@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-
+import 'package:save2woproj/components/card.dart';
 void main() {
   runApp(const Home());
 }
-
+int _index = 0;
 class Home extends StatelessWidget {
   const Home({super.key});
 
@@ -46,6 +46,7 @@ class Home extends StatelessWidget {
   }
 }
 
+//Components Start
 class _Logo extends StatelessWidget {
   const _Logo({Key? key}) : super(key: key);
 
@@ -95,6 +96,132 @@ class _Logo extends StatelessWidget {
   }
 }
 
+final _tabs = [DashboardCardCarousel(),HistoryTab(),SampleChart()];
+final List<String> _menuItems = ['Home', 'Profile', 'History', 'Logout'];
+
+Widget _drawer(BuildContext context) => Drawer(
+        child: ListView(
+          children: _menuItems.map((item) {
+            return ListTile(
+              onTap: () {
+                //_menuItems.indexWhere((_item) => _item == item)
+                if(item == 'Logout'){
+                  showDialog(context : context,builder: (BuildContext context){
+                    return const Logout();
+                  });
+                }else{
+              _index = _menuItems.indexWhere((_item) => _item == item);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => Panel()),
+                  );
+                }
+              },
+              title: Text(item),
+            );
+          }).toList(),
+        ),
+      );
+
+
+
+
+  Widget _navBarItems(BuildContext context) => Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: _menuItems
+            .map(
+              (item) => InkWell(
+                onTap: () {
+                //_menuItems.indexWhere((_item) => _item == item)
+                if(item == 'Logout'){
+                  showDialog(context : context,builder: (BuildContext context){
+                    return const Logout();
+                  });
+                }else{
+              _index = _menuItems.indexWhere((_item) => _item == item);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => Panel()),
+                  );
+                }
+              },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 24.0, horizontal: 16),
+                  child: Text(
+                    item,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                ),
+              ),
+            )
+            .toList(),
+      );
+
+//Logout Dialog
+class Logout extends StatelessWidget { 
+  const Logout({super.key});
+
+@override
+Widget build(BuildContext context){
+  return AlertDialog(
+    title: const Text('Are you sure to logout?'),
+    actions: <Widget>[
+      TextButton(
+        child: const Text('No'),
+        onPressed: () {
+          // Just close the dialog
+          Navigator.of(context).pop();
+        },
+      ),
+      TextButton(
+        child: const Text('Yes'),
+        onPressed: () {
+          // Close the dialog and navigate to Home
+          Navigator.of(context).pop();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Home()),
+          );
+        },
+      ),
+    ],
+  );
+}
+}
+
+enum Menu { itemOne, itemTwo, itemThree }
+
+class _ProfileIcon extends StatelessWidget {
+  const _ProfileIcon({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<Menu>(
+        icon: const Icon(Icons.person),
+        offset: const Offset(0, 40),
+        onSelected: (Menu item) {},
+        itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
+              const PopupMenuItem<Menu>(
+                value: Menu.itemOne,
+                child: Text('Account'),
+              ),
+              const PopupMenuItem<Menu>(
+                value: Menu.itemTwo,
+                child: Text('Settings'),
+              ),
+              const PopupMenuItem<Menu>(
+                value: Menu.itemThree,
+                child: Text('Logout'),
+              ),
+            ]);
+  }
+}
+
+//Components End
+
+//Tabs/Forms Start
 class _FormContent extends StatefulWidget {
   const _FormContent({Key? key}) : super(key: key);
 
@@ -192,7 +319,7 @@ class __FormContentState extends State<_FormContent> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => Dashboard()),
+                          builder: (context) => Panel()),
                     );
                   }
                 },
@@ -206,18 +333,27 @@ class __FormContentState extends State<_FormContent> {
 
   Widget _gap() => const SizedBox(height: 16);
 }
-
-class Dashboard extends StatelessWidget {
-  Dashboard({Key? key}) : super(key: key);
-
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
+class Panel extends StatefulWidget{
+  Panel ({super.key});
   @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final bool isLargeScreen = width > 800;
+  PanelState createState() => PanelState();
+}
+class PanelState extends State<Panel> {
+    
+    ValueNotifier<int> index = ValueNotifier<int>(_index);
+    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+    void setTabIndex(int newIndex) {
+        setState(() {
+          index.value = newIndex;
+        });
+      }
+    
+    @override
+    Widget build(BuildContext context){
+      final width = MediaQuery.of(context).size.width;
+      final bool isLargeScreen = width > 800;
 
-    return Theme(
+      return Theme(
       data: ThemeData.dark(),
       child: Scaffold(
         key: _scaffoldKey,
@@ -270,157 +406,10 @@ class Dashboard extends StatelessWidget {
         ),
         drawer: isLargeScreen ? null : _drawer(context),
         backgroundColor: const Color(0xffeaf4f7),
-        body: Center(
-          child: 
-            CarouselDemo(),
-          
-        ),
+        body: Center(child:  _tabs[_index],)
       ),
     );
-  }
-}
-
-
-  
-Widget _drawer(BuildContext context) => Drawer(
-        child: ListView(
-          children: _menuItems.map((item) {
-            return ListTile(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Tapped on $item'),
-                      actions: <Widget>[
-                        TextButton(
-                          child: Text('OK'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            if (item == "Logout") {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => Home()),
-                              );
-                            }
-                            else if (item == "History") {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => HistoryTab()),
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              title: Text(item),
-            );
-          }).toList(),
-        ),
-      );
-
-  final List<String> _menuItems = ['Home', 'Profile', 'History', 'Logout'];
-
-
-  Widget _navBarItems(BuildContext context) => Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: _menuItems
-            .map(
-              (item) => InkWell(
-                onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Tapped on $item'),
-                      actions: <Widget>[
-                        TextButton(
-                          child: Text('OK'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            if (item == "Logout") {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => Home()),
-                              );
-                            }
-                            else if (item == "History") {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => HistoryTab()),
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 24.0, horizontal: 16),
-                  child: Text(
-                    item,
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                ),
-              ),
-            )
-            .toList(),
-      );
-
-
-
-
-enum Menu { itemOne, itemTwo, itemThree }
-
-class _ProfileIcon extends StatelessWidget {
-  const _ProfileIcon({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<Menu>(
-        icon: const Icon(Icons.person),
-        offset: const Offset(0, 40),
-        onSelected: (Menu item) {},
-        itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
-              const PopupMenuItem<Menu>(
-                value: Menu.itemOne,
-                child: Text('Account'),
-              ),
-              const PopupMenuItem<Menu>(
-                value: Menu.itemTwo,
-                child: Text('Settings'),
-              ),
-              const PopupMenuItem<Menu>(
-                value: Menu.itemThree,
-                child: Text('Logout'),
-              ),
-            ]);
-  }
-}
-
-class SecondRoute extends StatelessWidget {
-  const SecondRoute({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    var screenWidth = MediaQuery.of(context).size.width;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Second Route'),
-      ),
-      drawer: (screenWidth > 800) ? null : _drawer(context),
-      body: const Center(
-        child: Text('Go back!s'),
-      ),
-    );
-  }
+    }
 }
 
 
@@ -470,77 +459,15 @@ class CarouselDemo extends StatelessWidget {
 class HistoryTab extends StatelessWidget {
   HistoryTab({Key? key}) : super(key: key);
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final bool isLargeScreen = width > 800;
-
-    return Theme(
-      data: ThemeData.dark(),
-      child: Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          backgroundColor: const Color(0xff088294),
-          elevation: 0,
-          titleSpacing: 0,
-          leading: isLargeScreen
-              ? null
-              : IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                ),
-          title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Container(
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: NetworkImage('assets/save2wo.png'),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (isLargeScreen) Expanded(child: _navBarItems(context))
-              ],
-            ),
-          ),
-          actions: const [
-            Padding(
-              padding: EdgeInsets.only(right: 16.0),
-              child: CircleAvatar(child: _ProfileIcon()),
-            )
-          ],
-        ),
-        drawer: isLargeScreen ? null : _drawer(context),
-        backgroundColor: const Color(0xffeaf4f7),
-        
-        body:
-        SingleChildScrollView(
+    return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(15.0),
             child: History(),
           ),
-        ),
-      ),
-    );
+        );
   }
 }
 class History extends StatelessWidget {
@@ -574,3 +501,24 @@ class History extends StatelessWidget {
     );
   }
 }
+//Tabs/Form End
+
+class SecondRoute extends StatelessWidget {
+  const SecondRoute({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Second Route'),
+      ),
+      drawer: (screenWidth > 800) ? null : _drawer(context),
+      body: const Center(
+        child: Text('Go back!s'),
+      ),
+    );
+  }
+}
+
+
