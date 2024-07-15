@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-//Sa makakabasa ng code na to:
-//Tsaka na ang documentation nito :P
 
+//Sample Only
+//Holds the data for datasource in Chart
 class SalesData {
   SalesData(this.year, this.sales);
   final String year;
@@ -22,7 +22,9 @@ Widget build(BuildContext context) {
           child: SfCartesianChart(
             // Initialize category axis
             primaryXAxis: CategoryAxis(),
-
+            //We have two components here:
+            //Our ChartData which is [SalesData] and our x axis stored in string
+            //
             series: <LineSeries<SalesData, String>>[
               LineSeries<SalesData, String>(
                 // Bind data source
@@ -48,10 +50,11 @@ Widget build(BuildContext context) {
 //Reference from CarouselDemo in main.dart
 class DashboardCardCarousel extends StatelessWidget{
 //Sample Only
+//This is a List of widget that will be displayed through the carousel
   final List<Widget> cardList= [
     const DashboardCard(title:"Lelouch Vi Britannia", content:"ALL HEIL LELOUCH! ALL HEIL LELOUCH! ALL HAIL GREAT BRITANNIA!", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTN62Y5Pm7ZRzEcpxqdyZRDrmeJZEKIi8OZAw&s"),
     const DashboardCard(title:"this is a warning", content:"using -> ", image:"https://www.usatoday.com/gcdn/authoring/authoring-images/2023/08/25/USAT/70680172007-alertsm.png?crop=1995,1499,x52,y0"),
-    const DashboardCard(title:"this is a danger", content: "Reusable components", image: "https://image.similarpng.com/very-thumbnail/2021/06/Attention-sign-icon.png"),
+    const DashboardCard(title:"this is a danger", content: "Reusable components", image: "https://image.similarpng.com/very-thumbnail/2021/06/Attention-sign-icon.png",innerRadius: 100, outerRadius: 108,),
      const ChartCard()
   ];
   @override
@@ -85,11 +88,39 @@ class DashboardCardCarousel extends StatelessWidget{
   }
 }
 
+//DashboardCard that holds:
+//[title] of the card
+//[content] of the card
+//[image] that will be a link for the image
+//
+// Some components are modifiable based on the requirements
+//[Padding] the padding of the card
+//[width] the maximum width of the card
+//[height] the maximum height of the card
+//[outerRadius] is the radius of the [CircleAvatar] on outside of the image
+//[innerRadius] is the radius of the [CircleAvatar] that holds the image
 class DashboardCard extends StatefulWidget{
   final String title;
   final String content;
   final String image;
-  const DashboardCard({Key? key, required this.title, required this.content, required this.image}) :
+
+  final double? padding;
+  final double? width;
+  final double? height;
+
+  final double? outerRadius;
+  final double? innerRadius;
+  const DashboardCard({
+  Key? key, 
+  required this.title, 
+  required this.content, 
+  required this.image,
+  this.padding,
+  this.width,
+  this.height,
+  this.innerRadius,
+  this.outerRadius
+  }) :
     super(key:key);
 
 @override
@@ -103,16 +134,20 @@ class StateDashboardCard extends State<DashboardCard>{
     final title = widget.title;
     final content = widget.content;
     final image = widget.image;
-
+    final padding = widget.padding ?? 20.0;
+    final height = widget.height ?? 600;
+    final width = widget.width ?? 800;
+    final innerRadius = widget.innerRadius ?? 50;
+    final outerRadius = widget.outerRadius ?? 59;
     return Card(
       elevation: 50,
       shadowColor: Colors.black,
       color: Color(0xff088294),
       child: SizedBox(
-        width: 800,
-        height: 600,
+        width: width,
+        height: height,
         child: Padding(
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.all(padding),
           child: 
           Column(
             children: <Widget>[
@@ -120,10 +155,10 @@ class StateDashboardCard extends State<DashboardCard>{
                 children: <Widget>[
                   CircleAvatar(
                     backgroundColor: Color.fromARGB(255, 43, 211, 236),
-                    radius: 108,
+                    radius: outerRadius,
                     child: CircleAvatar(
                       backgroundImage: NetworkImage(image), //<- the image link is here
-                      radius: 100,
+                      radius: innerRadius,
                     ),
                   ),
                   const SizedBox(width: 10), // Changed from height to width for horizontal spacing
@@ -139,23 +174,27 @@ class StateDashboardCard extends State<DashboardCard>{
                             fontWeight: FontWeight.w400,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        _gap(),
                         Text( //Content goes here
                         content,
                           style: const TextStyle(fontSize: 15, color: Colors.white),
                         ),
-                        const SizedBox(height: 10),
+                        _gap(),
                       ],
                     ),
                   ),
                 ],
               ),
+              
+              //->> you can add some components here
             ],
           )
         )
       )
     );
   }
+
+  Widget _gap() =>  const SizedBox(height: 15);
 }
 
 //To be changed

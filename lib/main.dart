@@ -2,9 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:save2woproj/components/card.dart';
 void main() {
-  runApp(const Home());
+  runApp(const DevMode());
 }
+//For development purposes
+//
+//So you don't have to go through login screen every start or reload
+//change runApp([widget]) on deployment or if login is necessary
+//```dart
+//void main(){
+// runApp(const Home());
+//}
+//```
+class DevMode extends StatelessWidget {
+  const DevMode({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Panel()
+    );
+  }
+}
+// Current index for pages
+//
+//Value of [_index] is changed on functions onTap() located at _navBarItems and _drawer
 int _index = 0;
+
+//This is will be the starting point of the App
 class Home extends StatelessWidget {
   const Home({super.key});
 
@@ -23,6 +47,7 @@ class Home extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         _Logo(),
+                        //Login form
                         _FormContent(),
                       ],
                     )
@@ -95,22 +120,32 @@ class _Logo extends StatelessWidget {
     );
   }
 }
-
+//Widgets that is accessed by [Panel()] through [_index]
+//
+//List of Menu Items
 final _tabs = [DashboardCardCarousel(),HistoryTab(),SampleChart()];
 final List<String> _menuItems = ['Home', 'Profile', 'History', 'Logout'];
+
 
 Widget _drawer(BuildContext context) => Drawer(
         child: ListView(
           children: _menuItems.map((item) {
             return ListTile(
               onTap: () {
-                //_menuItems.indexWhere((_item) => _item == item)
+                
                 if(item == 'Logout'){
                   showDialog(context : context,builder: (BuildContext context){
                     return const Logout();
                   });
                 }else{
-              _index = _menuItems.indexWhere((_item) => _item == item);
+                //_menuItems.indexWhere((_item) => _item == item) returns int
+                //
+                //Whereas [_item] is our value in [_menuItems]
+                //while [item] is selected [onTap()]
+                //the [index] is returned by matching the onTapped item to our [_menuItems._item]
+                _index = _menuItems.indexWhere((_item) => _item == item);
+
+                //The existing page will be replaced by [Panel()]
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => Panel()),
@@ -139,7 +174,12 @@ Widget _drawer(BuildContext context) => Drawer(
                     return const Logout();
                   });
                 }else{
-              _index = _menuItems.indexWhere((_item) => _item == item);
+                //_menuItems.indexWhere((_item) => _item == item) returns int
+                //
+                //Whereas [_item] is our value in [_menuItems]
+                //while [item] is selected [onTap()]
+                //the [index] is returned by matching the onTapped item to our [_menuItems._item]
+                _index = _menuItems.indexWhere((_item) => _item == item);
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => Panel()),
@@ -163,6 +203,12 @@ Widget _drawer(BuildContext context) => Drawer(
 class Logout extends StatelessWidget { 
   const Logout({super.key});
 
+//Pops a dialog prompting for logging out
+//
+//Creates two selection in [actions]
+//
+//When [TextButton.No] is pressed it will return to original position
+//When [TextButton.Yes] is pressed it will push the existing page to the Login Page
 @override
 Widget build(BuildContext context){
   return AlertDialog(
@@ -250,6 +296,8 @@ class __FormContentState extends State<_FormContent> {
                   return 'Please enter some text';
                 }
 
+                //Returns [True] if input match the pattern
+                //Else [False]
                 bool emailValid = RegExp(
                         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                     .hasMatch(value);
@@ -304,6 +352,7 @@ class __FormContentState extends State<_FormContent> {
                       borderRadius: BorderRadius.circular(4)),
                   backgroundColor: const Color(0xff108494),
                 ),
+                //Here is the Sign In button
                 child: const Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(
@@ -333,20 +382,18 @@ class __FormContentState extends State<_FormContent> {
 
   Widget _gap() => const SizedBox(height: 16);
 }
+//Holds the components together
+//Dynamically built for switching tabs
 class Panel extends StatefulWidget{
-  Panel ({super.key});
+  const Panel ({super.key});
   @override
   PanelState createState() => PanelState();
 }
 class PanelState extends State<Panel> {
     
-    ValueNotifier<int> index = ValueNotifier<int>(_index);
+
     final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-    void setTabIndex(int newIndex) {
-        setState(() {
-          index.value = newIndex;
-        });
-      }
+   
     
     @override
     Widget build(BuildContext context){
@@ -455,7 +502,7 @@ class CarouselDemo extends StatelessWidget {
 
 
 
-
+//Creates a scrollable page through [SingleChildScrollView]
 class HistoryTab extends StatelessWidget {
   HistoryTab({Key? key}) : super(key: key);
 
@@ -470,6 +517,7 @@ class HistoryTab extends StatelessWidget {
         );
   }
 }
+//Summary: a table of sample data
 class History extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
