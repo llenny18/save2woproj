@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:save2woproj/components/card.dart';
+import 'package:save2woproj/components/history.dart';
 void main() {
   runApp(const DevMode());
 }
@@ -507,52 +508,7 @@ class CarouselDemo extends StatelessWidget {
 
 
 //Creates a scrollable page through [SingleChildScrollView]
-class HistoryTab extends StatelessWidget {
-  HistoryTab({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(15.0),
-            child: History(),
-          ),
-        );
-  }
-}
-//Summary: a table of sample data
-class History extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      child: DataTable(
-        columns: const <DataColumn>[
-          DataColumn(
-            label: Text('Name', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-          ),
-          DataColumn(
-            label: Text('Age', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-          ),
-          DataColumn(
-            label: Text('City', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-          ),
-        ],
-        rows: List<DataRow>.generate(
-          20,
-          (index) => DataRow(
-            cells: <DataCell>[
-              DataCell(Text('Name ${index + 1}', style: const TextStyle( color: Colors.black))),
-              DataCell(Text('${20 + index}', style: const TextStyle( color: Colors.black))),
-              DataCell(Text('City ${index % 5}', style: const TextStyle( color: Colors.black))),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 //Tabs/Form End
 
 class SecondRoute extends StatelessWidget {
