@@ -123,7 +123,11 @@ class _Logo extends StatelessWidget {
 //Widgets that is accessed by [Panel()] through [_index]
 //
 //List of Menu Items
-final _tabs = [DashboardCardCarousel(),HistoryTab(),SampleChart()];
+final _tabs = [const CounterCard(
+  title: 'Everytime',
+  count: 99,
+  countName: 'You farted',
+),HistoryTab(),SampleChart()];
 final List<String> _menuItems = ['Home', 'Profile', 'History', 'Logout'];
 
 
@@ -569,4 +573,20 @@ class SecondRoute extends StatelessWidget {
   }
 }
 
+class Dashboard extends StatelessWidget{
+  const Dashboard({super.key});
 
+  @override Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(children: [
+        Row(
+          children: [
+            
+            DashboardCardCarousel()
+          ],
+
+        )
+      ],),
+    );
+  }
+}
