@@ -484,6 +484,9 @@ class PanelState extends State<Panel> {
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
+      SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: 
       Row(
         mainAxisAlignment: MainAxisAlignment.center, // Center items in the row
         children: [
@@ -496,8 +499,9 @@ class PanelState extends State<Panel> {
           ),
         ],
       ),
+      ),
       SizedBox(
-        height: 400, // Custom height for the second row
+        height: 500, // Custom height for the second row
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
