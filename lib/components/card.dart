@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-//Sample Only
-//Holds the data for datasource in Chart
+// Sample Only
+// Holds the data for datasource in Chart
 class SalesData {
   SalesData(this.year, this.sales);
   final String year;
   final double sales;
 }
 
-//Sample Only for reference
-//Dependencies used: Syncfusion [https://pub.dev/packages/syncfusion_flutter_charts]
-//Documentations:https://help.syncfusion.com/flutter/introduction/overview
+// Sample Only for reference
+// Dependencies used: Syncfusion [https://pub.dev/packages/syncfusion_flutter_charts]
+// Documentations:https://help.syncfusion.com/flutter/introduction/overview
 class SampleChart extends StatelessWidget {
   const SampleChart({super.key});
   @override
@@ -23,9 +24,8 @@ class SampleChart extends StatelessWidget {
                 child: SfCartesianChart(
                     // Initialize category axis
                     primaryXAxis: CategoryAxis(),
-                    //We have two components here:
-                    //Our ChartData which is [SalesData] and our x axis stored in string
-                    //
+                    // We have two components here:
+                    // Our ChartData which is [SalesData] and our x axis stored in string
                     series: <LineSeries<SalesData, String>>[
           LineSeries<SalesData, String>(
               // Bind data source
@@ -42,10 +42,16 @@ class SampleChart extends StatelessWidget {
   }
 }
 
-//Reference from CarouselDemo in main.dart
-class DashboardCardCarousel extends StatelessWidget {
-//Sample Only
-//This is a List of widget that will be displayed through the carousel
+// Reference from CarouselDemo in main.dart
+class DashboardCardCarousel extends StatefulWidget {
+  @override
+  _DashboardCardCarouselState createState() => _DashboardCardCarouselState();
+}
+
+class _DashboardCardCarouselState extends State<DashboardCardCarousel> {
+  final CarouselController _controller = CarouselController();
+  int _currentIndex = 0;
+
   final List<Widget> cardList = [
     const DashboardCard(
         title: "Lelouch Vi Britannia",
@@ -68,47 +74,71 @@ class DashboardCardCarousel extends StatelessWidget {
     ),
     const ChartCard()
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffeaf4f7),
-      body: Center(
-        child: CarouselSlider(
-          options: CarouselOptions(
-            height: 400,
-            aspectRatio: 16 / 9,
-            viewportFraction: 0.8,
-            initialPage: 0,
-            enableInfiniteScroll: true,
-            reverse: false,
-            autoPlay: true,
-            autoPlayInterval: Duration(seconds: 3),
-            autoPlayAnimationDuration: Duration(milliseconds: 800),
-            enlargeCenterPage: true,
-            scrollDirection: Axis.horizontal,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CarouselSlider(
+            items: cardList
+                .map(
+                  (item) => Center(child: item),
+                )
+                .toList(),
+            carouselController: _controller,
+            options: CarouselOptions(
+              height: 400,
+              aspectRatio: 16 / 9,
+              viewportFraction: 0.8,
+              initialPage: 0,
+              enableInfiniteScroll: true,
+              reverse: false,
+              autoPlay: true,
+              autoPlayInterval: Duration(seconds: 3),
+              autoPlayAnimationDuration: Duration(milliseconds: 800),
+              enlargeCenterPage: true,
+              scrollDirection: Axis.horizontal,
+              onPageChanged: (index, reason) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+            ),
           ),
-          items: cardList
-              .map(
-                (item) => Center(child: item),
-              )
-              .toList(),
-        ),
+          SizedBox(height: 20),
+          AnimatedSmoothIndicator(
+            activeIndex: _currentIndex,
+            count: cardList.length,
+            effect: ExpandingDotsEffect(
+              dotHeight: 10,
+              dotWidth: 10,
+              activeDotColor: Colors.blue,
+              dotColor: Colors.grey,
+            ),
+            onDotClicked: (index) {
+              _controller.animateToPage(index);
+            },
+          ),
+        ],
       ),
     );
   }
 }
 
-//DashboardCard that holds:
-//[title] of the card
-//[content] of the card
-//[image] that will be a link for the image
+// DashboardCard that holds:
+// [title] of the card
+// [content] of the card
+// [image] that will be a link for the image
 //
 // Some components are modifiable based on the requirements
-//[Padding] the padding of the card
-//[width] the maximum width of the card
-//[height] the maximum height of the card
-//[outerRadius] is the radius of the [CircleAvatar] on outside of the image
-//[innerRadius] is the radius of the [CircleAvatar] that holds the image
+// [Padding] the padding of the card
+// [width] the maximum width of the card
+// [height] the maximum height of the card
+// [outerRadius] is the radius of the [CircleAvatar] on outside of the image
+// [innerRadius] is the radius of the [CircleAvatar] that holds the image
 class DashboardCard extends StatefulWidget {
   final String title;
   final String content;
@@ -167,7 +197,7 @@ class StateDashboardCard extends State<DashboardCard> {
                           radius: outerRadius,
                           child: CircleAvatar(
                             backgroundImage:
-                                NetworkImage(image), //<- the image link is here
+                                NetworkImage(image), // <- the image link is here
                             radius: innerRadius,
                           ),
                         ),
@@ -180,7 +210,7 @@ class StateDashboardCard extends State<DashboardCard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Text(
-                                //Title goes here
+                                // Title goes here
                                 title,
                                 style: const TextStyle(
                                   fontSize: 30,
@@ -190,7 +220,7 @@ class StateDashboardCard extends State<DashboardCard> {
                               ),
                               _gap(),
                               Text(
-                                //Content goes here
+                                // Content goes here
                                 content,
                                 style: const TextStyle(
                                     fontSize: 15, color: Colors.white),
@@ -202,7 +232,7 @@ class StateDashboardCard extends State<DashboardCard> {
                       ],
                     ),
 
-                    //->> you can add some components here
+                    // ->> you can add some components here
                   ],
                 ))));
   }
@@ -210,7 +240,7 @@ class StateDashboardCard extends State<DashboardCard> {
   Widget _gap() => const SizedBox(height: 15);
 }
 
-//To be changed
+// To be changed
 class ChartCard extends StatefulWidget {
   const ChartCard({super.key});
 
@@ -231,18 +261,16 @@ class StateChartCard extends State<ChartCard> {
             child: Padding(
               padding: EdgeInsets.all(10.0),
               child: SampleChart(),
-            )
-          )
-        );
+            )));
   }
 }
 
-//Card for listing counts
-//CounterCards holds:
-//[dropdown] the dropdown for filtering values
-//[count] amount of count
-//[countName] the name of the count
-//[title] the title of the card
+// Card for listing counts
+// CounterCards holds:
+// [dropdown] the dropdown for filtering values
+// [count] amount of count
+// [countName] the name of the count
+// [title] the title of the card
 class CounterCard extends StatefulWidget {
   final Widget? dropdown;
   final int count;

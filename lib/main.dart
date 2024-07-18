@@ -429,59 +429,96 @@ class PanelState extends State<Panel> {
     return Theme(
       data: ThemeData.dark(),
       child: Scaffold(
-          key: _scaffoldKey,
-          appBar: AppBar(
-            backgroundColor: const Color(0xff088294),
-            elevation: 0,
-            titleSpacing: 0,
-            leading: isLargeScreen
-                ? null
-                : IconButton(
-                    icon: const Icon(Icons.menu),
-                    onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                  ),
-            title: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: NetworkImage('assets/save2wo.png'),
-                              ),
+        key: _scaffoldKey,
+        appBar: AppBar(
+          backgroundColor: const Color(0xff088294),
+          elevation: 0,
+          titleSpacing: 0,
+          leading: isLargeScreen
+              ? null
+              : IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                ),
+          title: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Container(
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: NetworkImage('assets/save2wo.png'),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                  if (isLargeScreen) Expanded(child: _navBarItems(context))
-                ],
+                ),
+                if (isLargeScreen) Expanded(child: _navBarItems(context))
+              ],
+            ),
+          ),
+          actions: const [
+            Padding(
+              padding: EdgeInsets.only(right: 16.0),
+              child: CircleAvatar(child: _ProfileIcon()),
+            )
+          ],
+        ),
+        drawer: isLargeScreen ? null : _drawer(context),
+        backgroundColor: const Color(0xffeaf4f7),
+      body: SingleChildScrollView(
+  scrollDirection: Axis.vertical,
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: 
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center, // Center items in the row
+        children: [
+          Center(
+            child: _allTabs[_index], // First instance of _allTabs[_index]
+          ),
+          const SizedBox(width: 16), // Adjust the width as needed for spacing
+          Center(
+            child: _allTabs[_index], // Second instance of _allTabs[_index]
+          ),
+        ],
+      ),
+      ),
+      SizedBox(
+        height: 500, // Custom height for the second row
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Center(
+                child: DashboardCardCarousel(), // Second instance of _allTabs[_index]
               ),
             ),
-            actions: const [
-              Padding(
-                padding: EdgeInsets.only(right: 16.0),
-                child: CircleAvatar(child: _ProfileIcon()),
-              )
-            ],
-          ),
-          drawer: isLargeScreen ? null : _drawer(context),
-          backgroundColor: const Color(0xffeaf4f7),
-          body: Center(
-            child: _allTabs[_index],
-          )),
+          ],
+        ),
+      ),
+    ],
+  ),
+),
+
+
+      ),
     );
   }
 }
