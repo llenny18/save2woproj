@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:save2woproj/components/history.dart';
+import 'package:save2woproj/components/charts.dart';
 import 'package:save2woproj/main.dart';
 
 // Sample Only
@@ -318,7 +319,7 @@ class StateChartCard extends State<ChartCard> {
             height: 600,
             child: Padding(
               padding: EdgeInsets.all(10.0),
-              child: SampleChart(),
+              child: ThresholdChart(),
             )));
   }
 }
