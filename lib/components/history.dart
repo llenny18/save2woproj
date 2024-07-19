@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 import 'package:save2woproj/data/model.dart';
 
@@ -10,7 +11,6 @@ class HistoryTab extends StatefulWidget {
   const HistoryTab({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _HistoryPageState createState() => _HistoryPageState();
 }
 
@@ -46,8 +46,7 @@ class _HistoryPageState extends State<HistoryTab> {
         backgroundColor: const Color(0xffeaf4f7),
       ),
       backgroundColor: const Color(0xffeaf4f7),
-      body: 
-      Column(
+      body: Column(
         children: [
           ToggleButtons(
             borderRadius: BorderRadius.circular(30.0),
@@ -56,7 +55,7 @@ class _HistoryPageState extends State<HistoryTab> {
             color: Colors.grey,
             constraints: const BoxConstraints(
               minHeight: 40.0,
-              minWidth: 55.0,
+              minWidth: 70.0,
             ),
             isSelected: isSelected,
             onPressed: (int index) {
@@ -111,7 +110,7 @@ class _HistoryPageState extends State<HistoryTab> {
   }
 
   String _formatDate(DateTime dateTime) {
-    return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+    return DateFormat('MMMM d, yyyy').format(dateTime);
   }
 
   String _getStatus(History history) {
@@ -158,13 +157,13 @@ class _HistoryPageState extends State<HistoryTab> {
           children: <Widget>[
             Text(
               date,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Row(
               children: <Widget>[
                 Icon(icon, color: iconColor, size: 40),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,10 +176,10 @@ class _HistoryPageState extends State<HistoryTab> {
                           color: iconColor,
                         ),
                       ),
-                      const SizedBox(height: 5),
-                      Text(cage, style: const TextStyle(fontSize: 14, color: Colors.black)),
-                      const SizedBox(height: 5),
-                      Text('Cage Status: $status', style: const TextStyle(fontSize: 14, color: Colors.black)),
+                      SizedBox(height: 5),
+                      Text(cage, style: TextStyle(fontSize: 14, color: Colors.black)),
+                      SizedBox(height: 5),
+                      Text('Cage Status: $status', style: TextStyle(fontSize: 14, color: Colors.black)),
                     ],
                   ),
                 ),
