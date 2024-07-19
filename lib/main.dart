@@ -128,24 +128,18 @@ class _Logo extends StatelessWidget {
 //
 // List of Menu Items
 final _tabs = [
-  LatestFishKill(),
+  DashboardCardCarousel(),
   HistoryTab(),
   SampleChart()
 ];
-final List<String> _menuItems = ['Home', 'Profile', 'History', 'Logout'];
+final List<String> _menuItems = ['Home', 'History'];
 
 Widget _drawer(BuildContext context) => Drawer(
       child: ListView(
         children: _menuItems.map((item) {
           return ListTile(
             onTap: () {
-              if (item == 'Logout') {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return const Logout();
-                    });
-              } else {
+              
                 // _menuItems.indexWhere((_item) => _item == item) returns int
                 //
                 // Whereas [_item] is our value in [_menuItems]
@@ -158,7 +152,7 @@ Widget _drawer(BuildContext context) => Drawer(
                   context,
                   MaterialPageRoute(builder: (context) => const Panel()),
                 );
-              }
+              
             },
             title: Text(item),
           );
@@ -174,13 +168,7 @@ Widget _navBarItems(BuildContext context) => Row(
             (item) => InkWell(
               onTap: () {
                 // _menuItems.indexWhere((_item) => _item == item)
-                if (item == 'Logout') {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return const Logout();
-                      });
-                } else {
+                
                   // _menuItems.indexWhere((_item) => _item == item) returns int
                   //
                   // Whereas [_item] is our value in [_menuItems]
@@ -191,7 +179,7 @@ Widget _navBarItems(BuildContext context) => Row(
                     context,
                     MaterialPageRoute(builder: (context) => const Panel()),
                   );
-                }
+                
               },
               child: Padding(
                 padding:
@@ -477,46 +465,12 @@ class PanelState extends State<Panel> {
         ),
         drawer: isLargeScreen ? null : _drawer(context),
         backgroundColor: const Color(0xffeaf4f7),
-      body: SingleChildScrollView(
-  scrollDirection: Axis.vertical,
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: 
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center, // Center items in the row
-        children: [
-          Center(
-            child: _allTabs[_index], // First instance of _allTabs[_index]
+      body: Center(
+            child: _allTabs[_index],
+          )
           ),
-          const SizedBox(width: 16), // Adjust the width as needed for spacing
-          Center(
-            child: _allTabs[_index], // Second instance of _allTabs[_index]
-          ),
-        ],
-      ),
-      ),
-      SizedBox(
-        height: 500, // Custom height for the second row
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Center(
-                child: DashboardCardCarousel(), // Second instance of _allTabs[_index]
-              ),
-            ),
-          ],
-        ),
-      ),
-    ],
-  ),
-),
 
 
-      ),
     );
   }
 }
@@ -708,7 +662,7 @@ class StateLatestFishKill extends State<LatestFishKill>{
   Future<History> fetchLatestFishKill() async {
     // you can replace your api link with this link
     var uri = Uri.https('save2wo-api.vercel.app','/history/fish-kill/latest');
-    final response = await http.get(Uri.parse('http://localhost:3000/history/fish-kill/latest'));
+    final response = await http.get(uri);
     if (response.statusCode == 200) {
       List<dynamic> jsonData = json.decode(response.body);
        historyList = jsonData.map((data) => History.fromJson(data)).toList();

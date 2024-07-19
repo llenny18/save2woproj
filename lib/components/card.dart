@@ -3,6 +3,9 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:http/http.dart' as http;
+import 'package:save2woproj/components/history.dart';
+import 'package:save2woproj/main.dart';
+
 // Sample Only
 // Holds the data for datasource in Chart
 class SalesData {
@@ -48,10 +51,25 @@ class DashboardCardCarousel extends StatefulWidget {
   _DashboardCardCarouselState createState() => _DashboardCardCarouselState();
 }
 
+final _tabs = [
+  const CounterCard(
+    title: 'Hello',
+    count: 99,
+    countName: 'You farted',
+  ),
+  
+  SampleChart()
+];
+
+int _index = 0;
 class _DashboardCardCarouselState extends State<DashboardCardCarousel> {
+  final List<Widget> _allTabs = [
+      ..._tabs,
+      const HistoryTab(),
+      const ProfileTab(),
+    ];
   final CarouselController _controller = CarouselController();
   int _currentIndex = 0;
-
   final List<Widget> cardList = [
     const DashboardCard(
         title: "Lelouch Vi Britannia",
@@ -75,55 +93,94 @@ class _DashboardCardCarouselState extends State<DashboardCardCarousel> {
     const ChartCard()
   ];
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xffeaf4f7),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+@override
+Widget build(BuildContext context) {
+  
+  return Scaffold(
+    backgroundColor: const Color(0xffeaf4f7),
+    body: SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          CarouselSlider(
-            items: cardList
-                .map(
-                  (item) => Center(child: item),
-                )
-                .toList(),
-            carouselController: _controller,
-            options: CarouselOptions(
-              height: 400,
-              aspectRatio: 16 / 9,
-              viewportFraction: 0.8,
-              initialPage: 0,
-              enableInfiniteScroll: true,
-              reverse: false,
-              autoPlay: true,
-              autoPlayInterval: Duration(seconds: 3),
-              autoPlayAnimationDuration: Duration(milliseconds: 800),
-              enlargeCenterPage: true,
-              scrollDirection: Axis.horizontal,
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: LatestFishKill(),
+                ),
+                const SizedBox(width: 16),
+                
+              ],
             ),
           ),
-          SizedBox(height: 20),
-          AnimatedSmoothIndicator(
-            activeIndex: _currentIndex,
-            count: cardList.length,
-            effect: ExpandingDotsEffect(
-              dotHeight: 10,
-              dotWidth: 10,
-              activeDotColor: Colors.blue,
-              dotColor: Colors.grey,
+          SizedBox(
+            height: 500,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CarouselSlider(
+                          items: cardList
+                              .map(
+                                (item) => Center(child: item),
+                              )
+                              .toList(),
+                          carouselController: _controller,
+                          options: CarouselOptions(
+                            height: 400,
+                            aspectRatio: 16 / 9,
+                            viewportFraction: 0.8,
+                            initialPage: 0,
+                            enableInfiniteScroll: true,
+                            reverse: false,
+                            autoPlay: true,
+                            autoPlayInterval: Duration(seconds: 3),
+                            autoPlayAnimationDuration: Duration(milliseconds: 800),
+                            enlargeCenterPage: true,
+                            scrollDirection: Axis.horizontal,
+                            onPageChanged: (index, reason) {
+                              setState(() {
+                                _currentIndex = index;
+                              });
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        AnimatedSmoothIndicator(
+                          activeIndex: _currentIndex,
+                          count: cardList.length,
+                          effect: ExpandingDotsEffect(
+                            dotHeight: 10,
+                            dotWidth: 10,
+                            activeDotColor: Colors.blue,
+                            dotColor: Colors.grey,
+                          ),
+                          onDotClicked: (index) {
+                            _controller.animateToPage(index);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-            onDotClicked: (index) {
-              _controller.animateToPage(index);
-            },
           ),
         ],
       ),
+    ),
+ 
+
+      
+      
+    
     );
   }
 }
@@ -301,14 +358,14 @@ class StateCounterCard extends State<CounterCard> {
         shadowColor: Colors.black,
         color: const Color(0xff088294),
         child: SizedBox(
-            width: 300,
-            height: 275,
+            width: 250,
+            height: 250,
             child: Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(25.0),
               child: Column(
                 children: [
-                  dropdown,
-                  const SizedBox(width: 20),
+                  //dropdown,
+                  const SizedBox(width: 25),
                   Expanded(
                       child: Column(
                     children: [
