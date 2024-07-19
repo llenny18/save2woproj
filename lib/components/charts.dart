@@ -72,7 +72,7 @@ class _SampleChartState extends State<ThresholdChart> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Threshold Records Chart'),
+        title: const Text('Threshold Records Chart', style: TextStyle( fontWeight: FontWeight.bold,  fontFamily: 'Metropolis')),
       ),
       body: Center(
         child: Container(

@@ -130,34 +130,41 @@ final _tabs = [
   DashboardCardCarousel(),
   HistoryTab(),
   SampleChart()
-];
-final List<String> _menuItems = ['Home', 'History'];
+];final List<String> _menuItems = ['Home', 'History'];
 
 Widget _drawer(BuildContext context) => Drawer(
-      child: ListView(
-        children: _menuItems.map((item) {
-          return ListTile(
-            onTap: () {
-              
-                // _menuItems.indexWhere((_item) => _item == item) returns int
-                //
-                // Whereas [_item] is our value in [_menuItems]
-                // while [item] is selected [onTap()]
-                // the [index] is returned by matching the onTapped item to our [_menuItems._item]
-                _index = _menuItems.indexWhere((_item) => _item == item);
+  backgroundColor: const Color(0xff108494),
+  child: ListView(
+    children: _menuItems.map((item) {
+      IconData icon;
+      if (item == 'Home') {
+        icon = Icons.home;
+      } else if (item == 'History') {
+        icon = Icons.history;
+      } else {
+        icon = Icons.help; // Default icon if no match found
+      }
 
-                // The existing page will be replaced by [Panel()]
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Panel()),
-                );
-              
-            },
-            title: Text(item),
+      return ListTile(
+        leading: Icon(icon, color: Colors.white),
+        onTap: () {
+          // _menuItems.indexWhere((_item) => _item == item) returns int
+          // Whereas [_item] is our value in [_menuItems]
+          // while [item] is selected [onTap()]
+          // the [index] is returned by matching the onTapped item to our [_menuItems._item]
+          int _index = _menuItems.indexWhere((_item) => _item == item);
+
+          // The existing page will be replaced by [Panel()]
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const Panel()),
           );
-        }).toList(),
-      ),
-    );
+        },
+        title: Text(item, style: const TextStyle(fontSize: 27, fontFamily: 'Montserrat', color: Colors.white)),
+      );
+    }).toList(),
+  ),
+);
 
 Widget _navBarItems(BuildContext context) => Row(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -185,7 +192,7 @@ Widget _navBarItems(BuildContext context) => Row(
                     const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16),
                 child: Text(
                   item,
-                  style: const TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 22, fontFamily: 'Montserrat'),
                 ),
               ),
             ),
@@ -231,6 +238,7 @@ class Logout extends StatelessWidget {
   }
 }
 
+
 enum Menu { itemOne, itemTwo, itemThree }
 
 class _ProfileIcon extends StatelessWidget {
@@ -239,37 +247,48 @@ class _ProfileIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<Menu>(
-        icon: const Icon(Icons.person),
-        offset: const Offset(0, 40),
-        onSelected: (Menu item) {
-          if (item == Menu.itemThree) {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return const Logout();
-                });
-          } else if (item == Menu.itemOne) {
-            _index = 3; // Navigate to ProfileTab
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Panel()),
-            );
-          }
-        },
-        itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
-              const PopupMenuItem<Menu>(
-                value: Menu.itemOne,
-                child: Text('Account'),
-              ),
-              const PopupMenuItem<Menu>(
-                value: Menu.itemTwo,
-                child: Text('Settings'),
-              ),
-              const PopupMenuItem<Menu>(
-                value: Menu.itemThree,
-                child: Text('Logout'),
-              ),
-            ]);
+      icon: const Icon(Icons.person),
+      offset: const Offset(0, 40),
+      onSelected: (Menu item) {
+        if (item == Menu.itemThree) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const Logout();
+            },
+          );
+        } else if (item == Menu.itemOne) {
+          _index = 3; // Navigate to ProfileTab
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Panel()),
+          );
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
+        const PopupMenuItem<Menu>(
+          value: Menu.itemOne,
+          child: ListTile(
+            leading: Icon(Icons.account_circle, color: Colors.white),
+            title: Text('Account', style: TextStyle(fontSize: 16, fontFamily: 'Montserrat')),
+          ),
+        ),
+        const PopupMenuItem<Menu>(
+          value: Menu.itemTwo,
+          child: ListTile(
+            leading: Icon(Icons.settings, color: Colors.white),
+            title: Text('Settings', style: TextStyle(fontSize: 16, fontFamily: 'Montserrat')),
+          ),
+        ),
+        const PopupMenuItem<Menu>(
+          value: Menu.itemThree,
+          child: ListTile(
+            leading: Icon(Icons.logout, color: Colors.white),
+            title: Text('Logout', style: TextStyle(fontSize: 16, fontFamily: 'Montserrat')),
+          ),
+        ),
+      ],
+    );
   }
 }
 
