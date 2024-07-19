@@ -126,11 +126,7 @@ class _Logo extends StatelessWidget {
 //
 // List of Menu Items
 final _tabs = [
-  const CounterCard(
-    title: 'Everytime',
-    count: 99,
-    countName: 'You farted',
-  ),
+  DashboardCardCarousel(),
   HistoryTab(),
   SampleChart()
 ];
@@ -469,7 +465,8 @@ class PanelState extends State<Panel> {
         backgroundColor: const Color(0xffeaf4f7),
       body: Center(
             child: _allTabs[_index],
-          )),
+          )
+          ),
 
 
     );
