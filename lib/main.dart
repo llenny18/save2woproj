@@ -152,7 +152,7 @@ Widget _drawer(BuildContext context) => Drawer(
           // Whereas [_item] is our value in [_menuItems]
           // while [item] is selected [onTap()]
           // the [index] is returned by matching the onTapped item to our [_menuItems._item]
-          int _index = _menuItems.indexWhere((_item) => _item == item);
+          _index = _menuItems.indexWhere((_item) => _item == item);
 
           // The existing page will be replaced by [Panel()]
           Navigator.pushReplacement(
