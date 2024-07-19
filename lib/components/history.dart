@@ -1,4 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+
+import 'package:save2woproj/data/model.dart';
+
+
 
 class HistoryTab extends StatefulWidget {
   const HistoryTab({super.key});
@@ -8,15 +15,28 @@ class HistoryTab extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryTab> {
-  List<bool> isSelected = [true, false, false, false, false];
+  List<bool> isSelected = [true, false, false, false, false, false];
+  List<History> histories = []; // List to store fetched data
+  int selectedCage = 0; // To track the selected cage number
 
-  final List<Widget> cardList = [
-    _buildCard('JULY 02', 'Threshold DO High at 8:30 AM', 'Cage No: 1', 'Dissolved Oxygen Spike', Colors.red, Icons.warning),
-    _buildCard('JULY 02', 'Threshold Nitrate High at 8:30 AM', 'Cage No: 1', 'Dissolved Oxygen Spike', Colors.red, Icons.warning),
-    _buildCard('JULY 09', 'Water Quality is Stable!', 'Cage No: 2', 'No Contamination Spikes', Colors.green, Icons.check_circle),
-    _buildCard('JULY 01', 'pH Level is dropping', 'Cage No: 4', 'pH is unstable', Colors.orange, Icons.warning_amber_rounded),
-    // Add more cards here as needed
-  ];
+  @override
+  void initState() {
+    super.initState();
+    fetchHistory(); // Fetch data on initialization
+  }
+
+  Future<void> fetchHistory() async {
+    final response = await http.get(Uri.parse('https://save2wo-api.vercel.app/history'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonList = json.decode(response.body);
+      setState(() {
+        histories = jsonList.map((json) => History.fromJson(json)).toList();
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +63,7 @@ class _HistoryPageState extends State<HistoryTab> {
                 for (int i = 0; i < isSelected.length; i++) {
                   isSelected[i] = i == index;
                 }
+                selectedCage = index; // Update selectedCage
               });
             },
             children: const <Widget>[
@@ -51,17 +72,74 @@ class _HistoryPageState extends State<HistoryTab> {
               Text('Cage 2'),
               Text('Cage 3'),
               Text('Cage 4'),
+              Text('Cage 5'),
             ],
           ),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(8.0),
-              children: cardList,
+              children: _buildCardList(),
             ),
           ),
         ],
       ),
     );
+  }
+
+  List<Widget> _buildCardList() {
+    List<History> filteredHistories = _filterHistories();
+    return filteredHistories.map((history) {
+      return _buildCard(
+        _formatDate(history.timestamp),
+        'Contamination: ${history.contamination}',
+        'Cage No: ${history.cage}',
+        _getStatus(history),
+        _getIconColor(history),
+        _getIcon(history),
+      );
+    }).toList();
+  }
+
+  List<History> _filterHistories() {
+    if (selectedCage == 0) {
+      return histories; // Show all
+    } else {
+      // Filter based on selected cage
+      return histories.where((history) => history.cage == selectedCage).toList();
+    }
+  }
+
+  String _formatDate(DateTime dateTime) {
+    return DateFormat('MMMM d, yyyy').format(dateTime);
+  }
+
+  String _getStatus(History history) {
+    // Customize the status based on your needs
+    return history.contamination;
+  }
+
+  Color _getIconColor(History history) {
+    // Customize the icon color based on contamination
+    switch (history.contamination) {
+      case 'Dissolved Oxygen Spike':
+        return Colors.red;
+      case 'pH Level Unstable':
+        return Colors.orange;
+      default:
+        return Colors.green;
+    }
+  }
+
+  IconData _getIcon(History history) {
+    // Customize the icon based on contamination
+    switch (history.contamination) {
+      case 'Dissolved Oxygen Spike':
+        return Icons.warning;
+      case 'pH Level Unstable':
+        return Icons.warning_amber_rounded;
+      default:
+        return Icons.check_circle;
+    }
   }
 
   static Widget _buildCard(String date, String title, String cage, String status, Color iconColor, IconData icon) {
@@ -96,13 +174,12 @@ class _HistoryPageState extends State<HistoryTab> {
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: iconColor,
-                          
                         ),
                       ),
                       SizedBox(height: 5),
-                      Text(cage, style: TextStyle(fontSize: 14,  color: Colors.black)),
+                      Text(cage, style: TextStyle(fontSize: 14, color: Colors.black)),
                       SizedBox(height: 5),
-                      Text('Cage Status: $status', style: TextStyle(fontSize: 14,  color: Colors.black)),
+                      Text('Cage Status: $status', style: TextStyle(fontSize: 14, color: Colors.black)),
                     ],
                   ),
                 ),
