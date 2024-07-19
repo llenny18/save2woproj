@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:save2woproj/components/card.dart';
 import 'package:save2woproj/components/history.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:save2woproj/model/history.dart';
+import 'dart:convert';
 void main() {
   runApp(const DevMode());
 }
@@ -126,11 +128,7 @@ class _Logo extends StatelessWidget {
 //
 // List of Menu Items
 final _tabs = [
-  const CounterCard(
-    title: 'Everytime',
-    count: 99,
-    countName: 'You farted',
-  ),
+  LatestFishKill(),
   HistoryTab(),
   SampleChart()
 ];
@@ -685,6 +683,64 @@ class ProfileTab extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+
+
+//https://save2wo-api.vercel.app/history/fish-kill/latest
+
+class LatestFishKill extends StatefulWidget {
+  @override 
+  StateLatestFishKill createState() => StateLatestFishKill();
+}
+
+class StateLatestFishKill extends State<LatestFishKill>{
+
+  List<History> historyList = [];
+  Future<History?>? history;
+  @override
+  void initState(){
+    super.initState();
+    history = fetchLatestFishKill();
+  }
+  Future<History> fetchLatestFishKill() async {
+    // you can replace your api link with this link
+    var uri = Uri.https('save2wo-api.vercel.app','/history/fish-kill/latest');
+    final response = await http.get(Uri.parse('http://localhost:3000/history/fish-kill/latest'));
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = json.decode(response.body);
+       historyList = jsonData.map((data) => History.fromJson(data)).toList();
+        return historyList[0];
+    }else{
+      throw  Exception("Object is null");
+    }
+  }
+Widget buildDataWidget(context,snapshot) => CounterCard(count: snapshot.data.deadFish, countName: "Fish Kill", title: "Latest fish kill");
+
+@override
+  Widget build(BuildContext context) {
+    //History history = historyList[0];
+    return Container(
+      child: FutureBuilder<History?>(
+        future: history,
+        builder: (context, snapshot) {
+          if(snapshot.connectionState == ConnectionState.waiting){
+            return const CircularProgressIndicator();
+          }else if(snapshot.connectionState == ConnectionState.none){
+            return Container();
+          }else{
+            if(snapshot.hasData){
+              return buildDataWidget(context,snapshot);
+            }else if(snapshot.hasError){
+              return Text("${snapshot.error}");
+            }else{
+              return Container();
+            }
+          }
+        },
+        )
     );
   }
 }
