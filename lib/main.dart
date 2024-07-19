@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:save2woproj/components/card.dart';
 import 'package:save2woproj/components/history.dart';
+import 'package:save2woproj/data/historycard.dart';
+
 
 void main() {
   runApp(const DevMode());
