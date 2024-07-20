@@ -499,7 +499,6 @@ class PanelState extends State<Panel> {
 
 class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -605,7 +604,6 @@ class ProfileTab extends StatelessWidget {
 
 
 //https://save2wo-api.vercel.app/history/fish-kill/latest
-
 class LatestFishKill extends StatefulWidget {
   @override 
   StateLatestFishKill createState() => StateLatestFishKill();
