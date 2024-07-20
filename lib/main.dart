@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:save2woproj/components/card.dart';
 import 'package:save2woproj/components/history.dart';
 import 'package:http/http.dart' as http;
-import 'package:save2woproj/model/history.dart';
+import 'package:save2woproj/model/model.dart';
 import 'dart:convert';
 void main() {
   runApp(const DevMode());
@@ -132,33 +131,42 @@ final _tabs = [
   HistoryTab(),
   SampleChart()
 ];
+
 final List<String> _menuItems = ['Home', 'History'];
 
 Widget _drawer(BuildContext context) => Drawer(
-      child: ListView(
-        children: _menuItems.map((item) {
-          return ListTile(
-            onTap: () {
-              
-                // _menuItems.indexWhere((_item) => _item == item) returns int
-                //
-                // Whereas [_item] is our value in [_menuItems]
-                // while [item] is selected [onTap()]
-                // the [index] is returned by matching the onTapped item to our [_menuItems._item]
-                _index = _menuItems.indexWhere((_item) => _item == item);
+  backgroundColor: const Color(0xff108494),
+  child: ListView(
+    children: _menuItems.map((item) {
+      IconData icon;
+      if (item == 'Home') {
+        icon = Icons.home;
+      } else if (item == 'History') {
+        icon = Icons.history;
+      } else {
+        icon = Icons.help; // Default icon if no match found
+      }
 
-                // The existing page will be replaced by [Panel()]
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Panel()),
-                );
-              
-            },
-            title: Text(item),
+      return ListTile(
+        leading: Icon(icon, color: Colors.white),
+        onTap: () {
+          // _menuItems.indexWhere((_item) => _item == item) returns int
+          // Whereas [_item] is our value in [_menuItems]
+          // while [item] is selected [onTap()]
+          // the [index] is returned by matching the onTapped item to our [_menuItems._item]
+          _index = _menuItems.indexWhere((_item) => _item == item);
+
+          // The existing page will be replaced by [Panel()]
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const Panel()),
           );
-        }).toList(),
-      ),
-    );
+        },
+        title: Text(item, style: const TextStyle(fontSize: 27, fontFamily: 'Montserrat', color: Colors.white)),
+      );
+    }).toList(),
+  ),
+);
 
 Widget _navBarItems(BuildContext context) => Row(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -186,7 +194,7 @@ Widget _navBarItems(BuildContext context) => Row(
                     const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16),
                 child: Text(
                   item,
-                  style: const TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 22, fontFamily: 'Montserrat'),
                 ),
               ),
             ),
@@ -232,6 +240,7 @@ class Logout extends StatelessWidget {
   }
 }
 
+
 enum Menu { itemOne, itemTwo, itemThree }
 
 class _ProfileIcon extends StatelessWidget {
@@ -240,37 +249,48 @@ class _ProfileIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<Menu>(
-        icon: const Icon(Icons.person),
-        offset: const Offset(0, 40),
-        onSelected: (Menu item) {
-          if (item == Menu.itemThree) {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return const Logout();
-                });
-          } else if (item == Menu.itemOne) {
-            _index = 3; // Navigate to ProfileTab
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Panel()),
-            );
-          }
-        },
-        itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
-              const PopupMenuItem<Menu>(
-                value: Menu.itemOne,
-                child: Text('Account'),
-              ),
-              const PopupMenuItem<Menu>(
-                value: Menu.itemTwo,
-                child: Text('Settings'),
-              ),
-              const PopupMenuItem<Menu>(
-                value: Menu.itemThree,
-                child: Text('Logout'),
-              ),
-            ]);
+      icon: const Icon(Icons.person),
+      offset: const Offset(0, 40),
+      onSelected: (Menu item) {
+        if (item == Menu.itemThree) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const Logout();
+            },
+          );
+        } else if (item == Menu.itemOne) {
+          _index = 3; // Navigate to ProfileTab
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Panel()),
+          );
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
+        const PopupMenuItem<Menu>(
+          value: Menu.itemOne,
+          child: ListTile(
+            leading: Icon(Icons.account_circle, color: Colors.white),
+            title: Text('Account', style: TextStyle(fontSize: 16, fontFamily: 'Montserrat')),
+          ),
+        ),
+        const PopupMenuItem<Menu>(
+          value: Menu.itemTwo,
+          child: ListTile(
+            leading: Icon(Icons.settings, color: Colors.white),
+            title: Text('Settings', style: TextStyle(fontSize: 16, fontFamily: 'Montserrat')),
+          ),
+        ),
+        const PopupMenuItem<Menu>(
+          value: Menu.itemThree,
+          child: ListTile(
+            leading: Icon(Icons.logout, color: Colors.white),
+            title: Text('Logout', style: TextStyle(fontSize: 16, fontFamily: 'Montserrat')),
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -475,66 +495,7 @@ class PanelState extends State<Panel> {
   }
 }
 
-class CarouselDemo extends StatelessWidget {
-  final List<String> imgList = [
-    'https://www.aqueon.com/-/media/project/oneweb/aqueon/us/blog/ways-to-know-your-fish-are-happy/fish-are-happy-and-healthy-1.png',
-    'https://c02.purpledshub.com/uploads/sites/62/2022/09/GettyImages-200386624-001-d80a3ec.jpg?w=1029&webp=1',
-    'https://i.natgeofe.com/n/633757ae-c0c5-43e6-a1fe-11342b9b4b72/fish-hero_2x3.jpg',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xffeaf4f7),
-      body: Center(
-        child: CarouselSlider(
-          options: CarouselOptions(
-            height: 400,
-            aspectRatio: 16 / 9,
-            viewportFraction: 0.8,
-            initialPage: 0,
-            enableInfiniteScroll: true,
-            reverse: false,
-            autoPlay: true,
-            autoPlayInterval: const Duration(seconds: 3),
-            autoPlayAnimationDuration: const Duration(milliseconds: 800),
-            enlargeCenterPage: true,
-            scrollDirection: Axis.horizontal,
-          ),
-          items: imgList
-              .map((item) => Container(
-                    child: Center(
-                        child: Image.network(item,
-                            fit: BoxFit.cover, width: 1000)),
-                  ))
-              .toList(),
-        ),
-      ),
-    );
-  }
-}
-
-// Creates a scrollable page through [SingleChildScrollView]
-
 // Tabs/Form End
-
-class SecondRoute extends StatelessWidget {
-  const SecondRoute({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    var screenWidth = MediaQuery.of(context).size.width;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Second Route'),
-      ),
-      drawer: (screenWidth > 800) ? null : _drawer(context),
-      body: const Center(
-        child: Text('Go back!s'),
-      ),
-    );
-  }
-}
 
 class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
@@ -659,6 +620,7 @@ class StateLatestFishKill extends State<LatestFishKill>{
     super.initState();
     history = fetchLatestFishKill();
   }
+  
   Future<History> fetchLatestFishKill() async {
     // you can replace your api link with this link
     var uri = Uri.https('save2wo-api.vercel.app','/history/fish-kill/latest');
@@ -668,7 +630,7 @@ class StateLatestFishKill extends State<LatestFishKill>{
        historyList = jsonData.map((data) => History.fromJson(data)).toList();
         return historyList[0];
     }else{
-      throw  Exception("Object is null");
+      throw Exception("Object is null");
     }
   }
 Widget buildDataWidget(context,snapshot) => CounterCard(count: snapshot.data.deadFish, countName: "Fish Kill", title: "Latest fish kill");

@@ -4,6 +4,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:http/http.dart' as http;
 import 'package:save2woproj/components/history.dart';
+import 'package:save2woproj/components/charts.dart';
 import 'package:save2woproj/main.dart';
 
 // Sample Only
@@ -51,23 +52,12 @@ class DashboardCardCarousel extends StatefulWidget {
   _DashboardCardCarouselState createState() => _DashboardCardCarouselState();
 }
 
-final _tabs = [
-  const CounterCard(
-    title: 'Hello',
-    count: 99,
-    countName: 'You farted',
-  ),
-  
-  SampleChart()
-];
+final _tabs = [LatestFishKill(), SampleChart()];
 
 int _index = 0;
+
 class _DashboardCardCarouselState extends State<DashboardCardCarousel> {
-  final List<Widget> _allTabs = [
-      ..._tabs,
-      const HistoryTab(),
-      const ProfileTab(),
-    ];
+  final List<Widget> _allTabs = [..._tabs];
   final CarouselController _controller = CarouselController();
   int _currentIndex = 0;
   final List<Widget> cardList = [
@@ -93,94 +83,117 @@ class _DashboardCardCarouselState extends State<DashboardCardCarousel> {
     const ChartCard()
   ];
 
-@override
-Widget build(BuildContext context) {
-  
-  return Scaffold(
-    backgroundColor: const Color(0xffeaf4f7),
-    body: SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: LatestFishKill(),
-                ),
-                const SizedBox(width: 16),
-                
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 500,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CarouselSlider(
-                          items: cardList
-                              .map(
-                                (item) => Center(child: item),
-                              )
-                              .toList(),
-                          carouselController: _controller,
-                          options: CarouselOptions(
-                            height: 400,
-                            aspectRatio: 16 / 9,
-                            viewportFraction: 0.8,
-                            initialPage: 0,
-                            enableInfiniteScroll: true,
-                            reverse: false,
-                            autoPlay: true,
-                            autoPlayInterval: Duration(seconds: 3),
-                            autoPlayAnimationDuration: Duration(milliseconds: 800),
-                            enlargeCenterPage: true,
-                            scrollDirection: Axis.horizontal,
-                            onPageChanged: (index, reason) {
-                              setState(() {
-                                _currentIndex = index;
-                              });
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        AnimatedSmoothIndicator(
-                          activeIndex: _currentIndex,
-                          count: cardList.length,
-                          effect: ExpandingDotsEffect(
-                            dotHeight: 10,
-                            dotWidth: 10,
-                            activeDotColor: Colors.blue,
-                            dotColor: Colors.grey, 
-                          ),
-                          onDotClicked: (index) {
-                            _controller.animateToPage(index);
-                          },
-                        ),
-                      ],
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xffeaf4f7),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(
+              height: 100,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "WELCOME TO SAVE2WO",
+                    style: TextStyle(
+                      color: Color(0xff034c57),
+                      fontFamily: 'Montserrat',
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-              ],
+                  Text(
+                    "A system made to monitor and conserve the Taal Lake",
+                    style: TextStyle(
+                      color: Color(0xff034c57),
+                      fontFamily: 'Montserrat',
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: _allTabs[_index],
+                  ),
+                  const SizedBox(width: 16),
+                  Center(
+                    child: _allTabs[_index],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 500,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CarouselSlider(
+                            items: cardList
+                                .map(
+                                  (item) => Center(child: item),
+                                )
+                                .toList(),
+                            carouselController: _controller,
+                            options: CarouselOptions(
+                              height: 400,
+                              aspectRatio: 16 / 9,
+                              viewportFraction: 0.8,
+                              initialPage: 0,
+                              enableInfiniteScroll: true,
+                              reverse: false,
+                              autoPlay: true,
+                              autoPlayInterval: Duration(seconds: 3),
+                              autoPlayAnimationDuration:
+                                  Duration(milliseconds: 800),
+                              enlargeCenterPage: true,
+                              scrollDirection: Axis.horizontal,
+                              onPageChanged: (index, reason) {
+                                setState(() {
+                                  _currentIndex = index;
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          AnimatedSmoothIndicator(
+                            activeIndex: _currentIndex,
+                            count: cardList.length,
+                            effect: ExpandingDotsEffect(
+                              dotHeight: 10,
+                              dotWidth: 10,
+                              activeDotColor: Colors.blue,
+                              dotColor: Colors.grey,
+                            ),
+                            onDotClicked: (index) {
+                              _controller.animateToPage(index);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
- 
-
-      
-      
-    
     );
   }
 }
@@ -250,11 +263,12 @@ class StateDashboardCard extends State<DashboardCard> {
                     Row(
                       children: <Widget>[
                         CircleAvatar(
-                          backgroundColor: const Color.fromARGB(255, 43, 211, 236),
+                          backgroundColor:
+                              const Color.fromARGB(255, 43, 211, 236),
                           radius: outerRadius,
                           child: CircleAvatar(
-                            backgroundImage:
-                                NetworkImage(image), // <- the image link is here
+                            backgroundImage: NetworkImage(
+                                image), // <- the image link is here
                             radius: innerRadius,
                           ),
                         ),
@@ -270,17 +284,19 @@ class StateDashboardCard extends State<DashboardCard> {
                                 // Title goes here
                                 title,
                                 style: const TextStyle(
-                                  fontSize: 30,
-                                  color: Colors.white38,
-                                  fontWeight: FontWeight.w400,
-                                ),
+                                    fontSize: 30,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Metropolis'),
                               ),
                               _gap(),
                               Text(
                                 // Content goes here
                                 content,
                                 style: const TextStyle(
-                                    fontSize: 15, color: Colors.white),
+                                    fontSize: 15,
+                                    color: Colors.white,
+                                    fontFamily: 'Metropolis'),
                               ),
                               _gap(),
                             ],
@@ -317,7 +333,7 @@ class StateChartCard extends State<ChartCard> {
             height: 600,
             child: Padding(
               padding: EdgeInsets.all(10.0),
-              child: SampleChart(),
+              child: ThresholdChart(),
             )));
   }
 }
@@ -372,7 +388,9 @@ class StateCounterCard extends State<CounterCard> {
                       Text(
                         title,
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 25),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25,
+                            fontFamily: 'Metropolis'),
                       ),
                       CircleAvatar(
                         backgroundColor: const Color.fromARGB(255, 16, 71, 79),
@@ -386,7 +404,8 @@ class StateCounterCard extends State<CounterCard> {
                               style: const TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 50,
-                                  color: Colors.white),
+                                  color: Colors.white,
+                                  fontFamily: 'Metropolis'),
                             ),
                             // You can adjust the fontSize and other styles as needed
                             Text(
@@ -394,7 +413,8 @@ class StateCounterCard extends State<CounterCard> {
                               style: const TextStyle(
                                   fontWeight: FontWeight.w400,
                                   fontSize: 14,
-                                  color: Colors.white),
+                                  color: Colors.white,
+                                  fontFamily: 'Metropolis'),
                             ),
                           ],
                         ),
@@ -438,7 +458,9 @@ class StateCardDropdown extends State<CardDropdown> {
     final hint = widget.hint ?? 'Select a value';
     final selectList = widget.selectionList ?? _months;
     return DropdownButtonFormField<String>(
-      hint: Text(hint),
+      hint: Text(hint,
+          style: const TextStyle(
+              fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
       value: dropdownValue,
       decoration: InputDecoration(
         border: OutlineInputBorder(
@@ -453,7 +475,9 @@ class StateCardDropdown extends State<CardDropdown> {
       items: selectList.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(value),
+          child: Text(value,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
         );
       }).toList(),
     );
