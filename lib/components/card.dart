@@ -160,7 +160,7 @@ Widget build(BuildContext context) {
                             dotHeight: 10,
                             dotWidth: 10,
                             activeDotColor: Colors.blue,
-                            dotColor: Colors.grey,
+                            dotColor: Colors.grey, 
                           ),
                           onDotClicked: (index) {
                             _controller.animateToPage(index);
