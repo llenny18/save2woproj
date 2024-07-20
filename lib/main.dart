@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:save2woproj/components/card.dart';
 import 'package:save2woproj/components/history.dart';
-import 'package:http/http.dart' as http;
 import 'package:save2woproj/model/model.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'data/login.dart';
+
 void main() {
   runApp(const DevMode());
 }
@@ -45,22 +47,23 @@ class Home extends StatelessWidget {
 
             return Center(
               child: isSmallScreen
-                  ? const Column(
+                  ? Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         _Logo(),
-                        // Login form
-                        _FormContent(),
+                        LoginScreen(), // Use the LoginScreen widget here
                       ],
                     )
                   : Container(
                       padding: const EdgeInsets.all(32.0),
                       constraints: const BoxConstraints(maxWidth: 800),
-                      child: const Row(
+                      child: Row(
                         children: [
                           Expanded(child: _Logo()),
                           Expanded(
-                            child: Center(child: _FormContent()),
+                            child: Center(
+                                child:
+                                    LoginScreen()), // Use the LoginScreen widget here
                           ),
                         ],
                       ),
@@ -126,47 +129,46 @@ class _Logo extends StatelessWidget {
 // Widgets that is accessed by [Panel()] through [_index]
 //
 // List of Menu Items
-final _tabs = [
-  DashboardCardCarousel(),
-  HistoryTab(),
-  SampleChart()
-];
-
+final _tabs = [DashboardCardCarousel(), HistoryTab(), SampleChart()];
 final List<String> _menuItems = ['Home', 'History'];
 
 Widget _drawer(BuildContext context) => Drawer(
-  backgroundColor: const Color(0xff108494),
-  child: ListView(
-    children: _menuItems.map((item) {
-      IconData icon;
-      if (item == 'Home') {
-        icon = Icons.home;
-      } else if (item == 'History') {
-        icon = Icons.history;
-      } else {
-        icon = Icons.help; // Default icon if no match found
-      }
+      backgroundColor: const Color(0xff108494),
+      child: ListView(
+        children: _menuItems.map((item) {
+          IconData icon;
+          if (item == 'Home') {
+            icon = Icons.home;
+          } else if (item == 'History') {
+            icon = Icons.history;
+          } else {
+            icon = Icons.help; // Default icon if no match found
+          }
 
-      return ListTile(
-        leading: Icon(icon, color: Colors.white),
-        onTap: () {
-          // _menuItems.indexWhere((_item) => _item == item) returns int
-          // Whereas [_item] is our value in [_menuItems]
-          // while [item] is selected [onTap()]
-          // the [index] is returned by matching the onTapped item to our [_menuItems._item]
-          _index = _menuItems.indexWhere((_item) => _item == item);
+          return ListTile(
+            leading: Icon(icon, color: Colors.white),
+            onTap: () {
+              // _menuItems.indexWhere((_item) => _item == item) returns int
+              // Whereas [_item] is our value in [_menuItems]
+              // while [item] is selected [onTap()]
+              // the [index] is returned by matching the onTapped item to our [_menuItems._item]
+              _index = _menuItems.indexWhere((_item) => _item == item);
 
-          // The existing page will be replaced by [Panel()]
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const Panel()),
+              // The existing page will be replaced by [Panel()]
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const Panel()),
+              );
+            },
+            title: Text(item,
+                style: const TextStyle(
+                    fontSize: 27,
+                    fontFamily: 'Montserrat',
+                    color: Colors.white)),
           );
-        },
-        title: Text(item, style: const TextStyle(fontSize: 27, fontFamily: 'Montserrat', color: Colors.white)),
-      );
-    }).toList(),
-  ),
-);
+        }).toList(),
+      ),
+    );
 
 Widget _navBarItems(BuildContext context) => Row(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -176,25 +178,25 @@ Widget _navBarItems(BuildContext context) => Row(
             (item) => InkWell(
               onTap: () {
                 // _menuItems.indexWhere((_item) => _item == item)
-                
-                  // _menuItems.indexWhere((_item) => _item == item) returns int
-                  //
-                  // Whereas [_item] is our value in [_menuItems]
-                  // while [item] is selected [onTap()]
-                  // the [index] is returned by matching the onTapped item to our [_menuItems._item]
-                  _index = _menuItems.indexWhere((_item) => _item == item);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Panel()),
-                  );
-                
+
+                // _menuItems.indexWhere((_item) => _item == item) returns int
+                //
+                // Whereas [_item] is our value in [_menuItems]
+                // while [item] is selected [onTap()]
+                // the [index] is returned by matching the onTapped item to our [_menuItems._item]
+                _index = _menuItems.indexWhere((_item) => _item == item);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Panel()),
+                );
               },
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16),
                 child: Text(
                   item,
-                  style: const TextStyle(fontSize: 22, fontFamily: 'Montserrat'),
+                  style:
+                      const TextStyle(fontSize: 22, fontFamily: 'Montserrat'),
                 ),
               ),
             ),
@@ -240,7 +242,6 @@ class Logout extends StatelessWidget {
   }
 }
 
-
 enum Menu { itemOne, itemTwo, itemThree }
 
 class _ProfileIcon extends StatelessWidget {
@@ -272,21 +273,24 @@ class _ProfileIcon extends StatelessWidget {
           value: Menu.itemOne,
           child: ListTile(
             leading: Icon(Icons.account_circle, color: Colors.white),
-            title: Text('Account', style: TextStyle(fontSize: 16, fontFamily: 'Montserrat')),
+            title: Text('Account',
+                style: TextStyle(fontSize: 16, fontFamily: 'Montserrat')),
           ),
         ),
         const PopupMenuItem<Menu>(
           value: Menu.itemTwo,
           child: ListTile(
             leading: Icon(Icons.settings, color: Colors.white),
-            title: Text('Settings', style: TextStyle(fontSize: 16, fontFamily: 'Montserrat')),
+            title: Text('Settings',
+                style: TextStyle(fontSize: 16, fontFamily: 'Montserrat')),
           ),
         ),
         const PopupMenuItem<Menu>(
           value: Menu.itemThree,
           child: ListTile(
             leading: Icon(Icons.logout, color: Colors.white),
-            title: Text('Logout', style: TextStyle(fontSize: 16, fontFamily: 'Montserrat')),
+            title: Text('Logout',
+                style: TextStyle(fontSize: 16, fontFamily: 'Montserrat')),
           ),
         ),
       ],
@@ -435,62 +439,59 @@ class PanelState extends State<Panel> {
     return Theme(
       data: ThemeData.dark(),
       child: Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          backgroundColor: const Color(0xff088294),
-          elevation: 0,
-          titleSpacing: 0,
-          leading: isLargeScreen
-              ? null
-              : IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                ),
-          title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Container(
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: NetworkImage('assets/save2wo.png'),
+          key: _scaffoldKey,
+          appBar: AppBar(
+            backgroundColor: const Color(0xff088294),
+            elevation: 0,
+            titleSpacing: 0,
+            leading: isLargeScreen
+                ? null
+                : IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                  ),
+            title: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Container(
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: NetworkImage('assets/save2wo.png'),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                if (isLargeScreen) Expanded(child: _navBarItems(context))
-              ],
+                  if (isLargeScreen) Expanded(child: _navBarItems(context))
+                ],
+              ),
             ),
+            actions: const [
+              Padding(
+                padding: EdgeInsets.only(right: 16.0),
+                child: CircleAvatar(child: _ProfileIcon()),
+              )
+            ],
           ),
-          actions: const [
-            Padding(
-              padding: EdgeInsets.only(right: 16.0),
-              child: CircleAvatar(child: _ProfileIcon()),
-            )
-          ],
-        ),
-        drawer: isLargeScreen ? null : _drawer(context),
-        backgroundColor: const Color(0xffeaf4f7),
-      body: Center(
+          drawer: isLargeScreen ? null : _drawer(context),
+          backgroundColor: const Color(0xffeaf4f7),
+          body: Center(
             child: _allTabs[_index],
-          )
-          ),
-
-
+          )),
     );
   }
 }
