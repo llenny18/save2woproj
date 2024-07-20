@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:save2woproj/data/model.dart';
-
+import 'package:save2woproj/model/model.dart' as model;
 
 
 
@@ -18,11 +17,11 @@ class  ThresholdData {
 class ThresholdChart extends StatefulWidget {
   const ThresholdChart({super.key});
   @override
-  _SampleChartState createState() => _SampleChartState();
+  _TresholdChartState createState() => _TresholdChartState();
 }
 
-class _SampleChartState extends State<ThresholdChart> {
-  List< ThresholdData> _data = [];
+class _TresholdChartState extends State<ThresholdChart> {
+  List<ThresholdData> _data = [];
 
   @override
   void initState() {
@@ -36,7 +35,7 @@ class _SampleChartState extends State<ThresholdChart> {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        final thresholds = data.map((json) => ThresholdList.fromJson(json)).toList();
+        final thresholds = data.map((json) => model.Threshold.fromJson(json)).toList();
 
         // Sort thresholds by timestamp
         thresholds.sort((a, b) => a.timestamp.compareTo(b.timestamp));
