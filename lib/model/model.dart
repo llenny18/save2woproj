@@ -37,7 +37,7 @@ class Contamination extends BaseModel {
         temperature: waterQuality["Temperature"],
         nitrogen: waterQuality["NO2"],
       ),
-      contamination: json['Contamination'],
+      contamination: json['contamination'],
     );
   }
 }
