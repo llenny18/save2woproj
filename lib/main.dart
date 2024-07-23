@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:save2woproj/components/card.dart';
 import 'package:save2woproj/components/history.dart';
+import 'package:save2woproj/components/contamination.dart';
 import 'data/login.dart';
 
 void main() {
@@ -127,8 +128,8 @@ class _Logo extends StatelessWidget {
 // Widgets that is accessed by [Panel()] through [_index]
 //
 // List of Menu Items
-final _tabs = [DashboardCardCarousel(), HistoryTab(), SampleChart()];
-final List<String> _menuItems = ['Home', 'History'];
+final _tabs = [DashboardCardCarousel(), HistoryTab(), ContaminationTable(), SampleChart()];
+final List<String> _menuItems = ['Home', 'History', 'Records'];
 
 Widget _drawer(BuildContext context) => Drawer(
       backgroundColor: const Color(0xff108494),
