@@ -152,7 +152,7 @@ class StateDashboardCard extends State<DashboardCard> {
     final content = widget.content;
     final image = widget.image ?? "";
     final padding = widget.padding ?? 20.0;
-    final height = widget.height ?? 600;
+    final height = widget.height ?? 400;
     final width = widget.width ?? 800;
     final innerRadius = widget.innerRadius ?? 50;
     final outerRadius = widget.outerRadius ?? 59;
@@ -277,11 +277,20 @@ class StateCounterCard extends State<CounterCard> {
     final countName = widget.countName;
     final title = widget.title;
 
-
-    return Card(
-        elevation: 50,
-        shadowColor: Colors.black,
-        color: const Color(0xff088294),
+    //28BAF5
+    //26A1DA
+    return Container(
+        decoration: BoxDecoration(
+                    color: const Color(0xff088294), //36C2CE
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xff088294).withOpacity(0.5),
+                        spreadRadius: -12,
+                        blurRadius: 10,
+                        offset: const Offset(0, 25),
+                      ),
+                    ]),
         child: SizedBox(
             width: 250,
             height: 250,
@@ -289,7 +298,6 @@ class StateCounterCard extends State<CounterCard> {
               padding: const EdgeInsets.all(25.0),
               child: Column(
                 children: [
-                  //dropdown,
                   const SizedBox(width: 25),
                   Expanded(
                       child: Column(
@@ -302,7 +310,7 @@ class StateCounterCard extends State<CounterCard> {
                             fontFamily: 'Metropolis'),
                       ),
                       CircleAvatar(
-                        backgroundColor: const Color.fromARGB(255, 16, 71, 79),
+                        backgroundColor: Color.fromARGB(255, 17, 108, 122),
                         radius: 75,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment

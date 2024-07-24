@@ -33,7 +33,7 @@ class Contamination extends BaseModel {
       timestamp: DateTime.fromMillisecondsSinceEpoch(milliseconds),
       waterQuality: WaterQuality(
         dissolvedOxygen: waterQuality["DO"],
-        pH: waterQuality["pH"],
+        pH: waterQuality["pH"] ?? 0,
         temperature: waterQuality["Temperature"],
         nitrogen: waterQuality["NO2"],
       ),

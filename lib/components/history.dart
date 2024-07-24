@@ -61,44 +61,51 @@ class _HistoryPageState extends State<HistoryTab> {
       backgroundColor: const Color(0xffeaf4f7),
       body: Column(
         children: [
-          ToggleButtons(
-            borderRadius: BorderRadius.circular(30.0),
-            fillColor: const Color(0xff088294),
-            selectedColor: Colors.white,
-            color: Colors.grey,
-            constraints: const BoxConstraints(
-              minHeight: 40.0,
-              minWidth: 70.0,
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: <Widget>[
+                ToggleButtons(
+                  borderRadius: BorderRadius.circular(30.0),
+                  fillColor: const Color(0xff088294),
+                  selectedColor: Colors.white,
+                  color: Colors.grey,
+                  constraints: const BoxConstraints(
+                    minHeight: 40.0,
+                    minWidth: 70.0,
+                  ),
+                  isSelected: isSelected,
+                  onPressed: (int index) {
+                    setState(() {
+                      for (int i = 0; i < isSelected.length; i++) {
+                        isSelected[i] = i == index;
+                      }
+                      selectedCage = index; // Update selectedCage
+                    });
+                  },
+                  children: const <Widget>[
+                    Text('All',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
+                    Text('Cage 1',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
+                    Text('Cage 2',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
+                    Text('Cage 3',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
+                    Text('Cage 4',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
+                    Text('Cage 5',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
+                  ],
+                ),
+              ],
             ),
-            isSelected: isSelected,
-            onPressed: (int index) {
-              setState(() {
-                for (int i = 0; i < isSelected.length; i++) {
-                  isSelected[i] = i == index;
-                }
-                selectedCage = index; // Update selectedCage
-              });
-            },
-            children: const <Widget>[
-              Text('All',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
-              Text('Cage 1',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
-              Text('Cage 2',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
-              Text('Cage 3',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
-              Text('Cage 4',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
-              Text('Cage 5',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
-            ],
           ),
           Expanded(
             child: ListView(

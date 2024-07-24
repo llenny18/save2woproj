@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:save2woproj/components/card.dart';
 import 'package:save2woproj/components/history.dart';
+import 'package:save2woproj/components/weather.dart';
 import 'package:save2woproj/model/model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:save2woproj/data/login.dart';
 import 'package:save2woproj/model/globals.dart' as global;
 
-void main() {
-  runApp(const Home());
+
+void main(){
+
+  runApp(const DevMode());
 }
 
 // For development purposes
@@ -295,62 +298,59 @@ class PanelState extends State<Panel> {
     return Theme(
       data: ThemeData.dark(),
       child: Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          backgroundColor: const Color(0xff088294),
-          elevation: 0,
-          titleSpacing: 0,
-          leading: isLargeScreen
-              ? null
-              : IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                ),
-          title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Container(
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: AssetImage('assets/save2wo.png'),
+          key: _scaffoldKey,
+          appBar: AppBar(
+            backgroundColor: const Color(0xff088294),
+            elevation: 0,
+            titleSpacing: 0,
+            leading: isLargeScreen
+                ? null
+                : IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                  ),
+            title: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Container(
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: AssetImage('assets/save2wo.png'),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                if (isLargeScreen) Expanded(child: _navBarItems(context))
-              ],
-            ),
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: CircleAvatar(
-                child: _ProfileIcon(),
+                  if (isLargeScreen) Expanded(child: _navBarItems(context))
+                ],
               ),
-            )
-          ],
-        ),
-        drawer: isLargeScreen ? null : _drawer(context),
-        backgroundColor: const Color(0xffeaf4f7),
-        body: Center(
-          child: _tabs[_index],
-        ),
-      ),
+            ),
+            actions: const [
+              Padding(
+                padding: EdgeInsets.only(right: 16.0),
+                child: CircleAvatar(child: _ProfileIcon()),
+              )
+            ],
+          ),
+          drawer: isLargeScreen ? null : _drawer(context),
+          backgroundColor: const Color(0xffeaf4f7),
+          body: Center(
+            child: _tabs[_index],
+          )),
     );
   }
 }
@@ -359,6 +359,7 @@ class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: const Color(0xffeaf4f7),
       body: SingleChildScrollView(
@@ -366,7 +367,7 @@ class Dashboard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(
+            SizedBox(
               height: 100,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -376,7 +377,7 @@ class Dashboard extends StatelessWidget {
                     style: TextStyle(
                       color: Color(0xff034c57),
                       fontFamily: 'Montserrat',
-                      fontSize: 40,
+                      fontSize: size.height * 0.04,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -385,7 +386,7 @@ class Dashboard extends StatelessWidget {
                     style: TextStyle(
                       color: Color(0xff034c57),
                       fontFamily: 'Montserrat',
-                      fontSize: 20,
+                      fontSize: size.height * 0.01,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -417,6 +418,7 @@ class Dashboard extends StatelessWidget {
                 ],
               ),
             ),
+            Container(child: WeatherCard(),),
             DashboardCardCarousel()
           ],
         ),
