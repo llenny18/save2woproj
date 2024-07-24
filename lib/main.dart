@@ -126,7 +126,7 @@ final List<String> _menuItems = ['Home', 'History' ,'Records'];
 final Map<String, IconData> _iconList = {
   "Home": Icons.home,
   "History": Icons.history,
-  "Records" : Icons.
+  "Records" : Icons.list
 };
 
 Widget _drawer(BuildContext context) => Drawer(
