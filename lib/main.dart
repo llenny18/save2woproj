@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:save2woproj/components/card.dart';
 import 'package:save2woproj/components/history.dart';
+import 'package:save2woproj/components/contamination.dart';
 import 'package:save2woproj/components/weather.dart';
 import 'package:save2woproj/model/model.dart';
 import 'dart:convert';
@@ -120,11 +121,12 @@ class _Logo extends StatelessWidget {
   }
 }
 
-final _tabs = [Dashboard(), HistoryTab()];
-final List<String> _menuItems = ['Home', 'History'];
+final _tabs = [Dashboard(), HistoryTab(),ContaminationTable()];
+final List<String> _menuItems = ['Home', 'History' ,'Records'];
 final Map<String, IconData> _iconList = {
   "Home": Icons.home,
-  "History": Icons.history
+  "History": Icons.history,
+  "Records" : Icons.list
 };
 
 Widget _drawer(BuildContext context) => Drawer(
