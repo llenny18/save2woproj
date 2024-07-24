@@ -2,10 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-
-import 'package:save2woproj/data/model.dart';
-
-
+import 'package:save2woproj/model/model.dart';
 
 class HistoryTab extends StatefulWidget {
   const HistoryTab({super.key});
@@ -16,7 +13,7 @@ class HistoryTab extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryTab> {
   List<bool> isSelected = [true, false, false, false, false, false];
-  List<History> histories = []; // List to store fetched data
+  List<Contamination> histories = []; // List to store fetched data
   int selectedCage = 0; // To track the selected cage number
 
   @override
@@ -26,12 +23,14 @@ class _HistoryPageState extends State<HistoryTab> {
   }
 
   Future<void> fetchHistory() async {
-    final response = await http.get(Uri.parse('https://save2wo-api.vercel.app/history'));
+    final response = await http
+        .get(Uri.parse('https://save2wo-api.vercel.app/contamination'));
 
     if (response.statusCode == 200) {
       List<dynamic> jsonList = json.decode(response.body);
       setState(() {
-        histories = jsonList.map((json) => History.fromJson(json)).toList();
+        histories =
+            jsonList.map((json) => Contamination.fromJson(json)).toList();
       });
     } else {
       throw Exception('Failed to load data');
@@ -43,51 +42,70 @@ class _HistoryPageState extends State<HistoryTab> {
     return Scaffold(
       appBar: AppBar(
         title: const Center(
-  child: Padding(
-    padding: EdgeInsets.all(20.0),
-    child: Text(
-      'History of Cage Records',
-      style: TextStyle(
-        color: Color(0xff034c57),
-        fontFamily: 'Metropolis',
-        fontSize: 40,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  ),
-),
-toolbarHeight: 100,
+          child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Text(
+              'History of Cage Records',
+              style: TextStyle(
+                color: Color(0xff034c57),
+                fontFamily: 'Metropolis',
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        toolbarHeight: 100,
         backgroundColor: const Color(0xffeaf4f7),
       ),
       backgroundColor: const Color(0xffeaf4f7),
       body: Column(
         children: [
-          ToggleButtons(
-            borderRadius: BorderRadius.circular(30.0),
-            fillColor: const Color(0xff088294),
-            selectedColor: Colors.white,
-            color: Colors.grey,
-            constraints: const BoxConstraints(
-              minHeight: 40.0,
-              minWidth: 70.0,
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: <Widget>[
+                ToggleButtons(
+                  borderRadius: BorderRadius.circular(30.0),
+                  fillColor: const Color(0xff088294),
+                  selectedColor: Colors.white,
+                  color: Colors.grey,
+                  constraints: const BoxConstraints(
+                    minHeight: 40.0,
+                    minWidth: 70.0,
+                  ),
+                  isSelected: isSelected,
+                  onPressed: (int index) {
+                    setState(() {
+                      for (int i = 0; i < isSelected.length; i++) {
+                        isSelected[i] = i == index;
+                      }
+                      selectedCage = index; // Update selectedCage
+                    });
+                  },
+                  children: const <Widget>[
+                    Text('All',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
+                    Text('Cage 1',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
+                    Text('Cage 2',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
+                    Text('Cage 3',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
+                    Text('Cage 4',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
+                    Text('Cage 5',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
+                  ],
+                ),
+              ],
             ),
-            isSelected: isSelected,
-            onPressed: (int index) {
-              setState(() {
-                for (int i = 0; i < isSelected.length; i++) {
-                  isSelected[i] = i == index;
-                }
-                selectedCage = index; // Update selectedCage
-              });
-            },
-            children: const <Widget>[
-              Text('All', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
-              Text('Cage 1', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
-              Text('Cage 2', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
-              Text('Cage 3', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
-              Text('Cage 4', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
-              Text('Cage 5', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Metropolis')),
-            ],
           ),
           Expanded(
             child: ListView(
@@ -101,7 +119,7 @@ toolbarHeight: 100,
   }
 
   List<Widget> _buildCardList() {
-    List<History> filteredHistories = _filterHistories();
+    List<Contamination> filteredHistories = _filterHistories();
     return filteredHistories.map((history) {
       return _buildCard(
         _formatDate(history.timestamp),
@@ -114,49 +132,40 @@ toolbarHeight: 100,
     }).toList();
   }
 
-  List<History> _filterHistories() {
+  List<Contamination> _filterHistories() {
     if (selectedCage == 0) {
       return histories; // Show all
     } else {
       // Filter based on selected cage
-      return histories.where((history) => history.cage == selectedCage).toList();
+      return histories
+          .where((history) => history.cage == selectedCage)
+          .toList();
     }
   }
 
-  String _formatDate(DateTime dateTime) {
-    return DateFormat('MMMM d, yyyy').format(dateTime);
-  }
+  String _formatDate(DateTime dateTime) =>
+      DateFormat('MMMM d, yyyy').format(dateTime);
 
-  String _getStatus(History history) {
-    // Customize the status based on your needs
-    return history.contamination;
-  }
+  String _getStatus(Contamination history) => history.contamination;
+  Color _getIconColor(Contamination history) =>
+      _semantics[history.contamination]!.color;
+  IconData _getIcon(Contamination history) =>
+      _semantics[history.contamination]!.icon;
+  static final Map<String, IconSemantic> _iconSemantics = {
+    'Danger': IconSemantic(icon: Icons.warning, color: Colors.red),
+    'Warning':
+        IconSemantic(icon: Icons.warning_amber_rounded, color: Colors.orange),
+    'Normal': IconSemantic(icon: Icons.check_circle, color: Colors.green)
+  };
+  final Map<String, IconSemantic> _semantics = {
+    'Dissolved Oxygen Spike': _iconSemantics['Danger']!,
+    'Dissolved Oxygen Low': _iconSemantics['Danger']!,
+    'pH Level Unstable': _iconSemantics['Warning']!,
+    'Water Quality is Stable': _iconSemantics['Normal']!
+  };
 
-  Color _getIconColor(History history) {
-    // Customize the icon color based on contamination
-    switch (history.contamination) {
-      case 'Dissolved Oxygen Spike':
-        return Colors.red;
-      case 'pH Level Unstable':
-        return Colors.orange;
-      default:
-        return Colors.green;
-    }
-  }
-
-  IconData _getIcon(History history) {
-    // Customize the icon based on contamination
-    switch (history.contamination) {
-      case 'Dissolved Oxygen Spike':
-        return Icons.warning;
-      case 'pH Level Unstable':
-        return Icons.warning_amber_rounded;
-      default:
-        return Icons.check_circle;
-    }
-  }
-
-  static Widget _buildCard(String date, String title, String cage, String status, Color iconColor, IconData icon) {
+  static Widget _buildCard(String date, String title, String cage,
+      String status, Color iconColor, IconData icon) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
@@ -171,7 +180,11 @@ toolbarHeight: 100,
           children: <Widget>[
             Text(
               date,
-              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Color(0xff034c57), fontFamily: 'Metropolis'),
+              style: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xff034c57),
+                  fontFamily: 'Metropolis'),
             ),
             const SizedBox(height: 10),
             Row(
@@ -185,16 +198,23 @@ toolbarHeight: 100,
                       Text(
                         title,
                         style: TextStyle(
-                          fontSize: 21,
-                          fontWeight: FontWeight.bold,
-                          color: iconColor,
-                          fontFamily: 'Metropolis'
-                        ),
+                            fontSize: 21,
+                            fontWeight: FontWeight.bold,
+                            color: iconColor,
+                            fontFamily: 'Metropolis'),
                       ),
                       const SizedBox(height: 5),
-                      Text(cage, style: const TextStyle(fontSize: 17, color: Colors.black, fontFamily: 'Metropolis')),
+                      Text(cage,
+                          style: const TextStyle(
+                              fontSize: 17,
+                              color: Colors.black,
+                              fontFamily: 'Metropolis')),
                       const SizedBox(height: 5),
-                      Text('Cage Status: $status', style: const TextStyle(fontSize: 17, color: Colors.black, fontFamily: 'Metropolis')),
+                      Text('Cage Status: $status',
+                          style: const TextStyle(
+                              fontSize: 17,
+                              color: Colors.black,
+                              fontFamily: 'Metropolis')),
                     ],
                   ),
                 ),
@@ -205,4 +225,10 @@ toolbarHeight: 100,
       ),
     );
   }
+}
+
+class IconSemantic {
+  final IconData icon;
+  final Color color;
+  IconSemantic({required this.icon, required this.color});
 }
