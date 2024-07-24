@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:save2woproj/components/card.dart';
 import 'package:save2woproj/components/history.dart';
+import 'package:save2woproj/components/weather.dart';
 import 'package:save2woproj/model/model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'data/login.dart';
 
-void main() {
+
+void main(){
+
   runApp(const DevMode());
 }
 
@@ -102,7 +105,7 @@ class _Logo extends StatelessWidget {
                     shape: BoxShape.circle,
                     image: DecorationImage(
                       fit: BoxFit.cover,
-                      image: NetworkImage('assets/save2wo.png'),
+                      image: AssetImage('assets/save2wo.png'),
                     ),
                   ),
                 ),
@@ -365,7 +368,7 @@ class PanelState extends State<Panel> {
                               shape: BoxShape.circle,
                               image: DecorationImage(
                                 fit: BoxFit.cover,
-                                image: NetworkImage('assets/save2wo.png'),
+                                image: AssetImage('assets/save2wo.png'),
                               ),
                             ),
                           ),
@@ -399,6 +402,7 @@ class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: const Color(0xffeaf4f7),
       body: SingleChildScrollView(
@@ -406,7 +410,7 @@ class Dashboard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(
+            SizedBox(
               height: 100,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -416,7 +420,7 @@ class Dashboard extends StatelessWidget {
                     style: TextStyle(
                       color: Color(0xff034c57),
                       fontFamily: 'Montserrat',
-                      fontSize: 40,
+                      fontSize: size.height * 0.04,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -425,7 +429,7 @@ class Dashboard extends StatelessWidget {
                     style: TextStyle(
                       color: Color(0xff034c57),
                       fontFamily: 'Montserrat',
-                      fontSize: 20,
+                      fontSize: size.height * 0.01,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -453,6 +457,7 @@ class Dashboard extends StatelessWidget {
                 ],
               ),
             ),
+            Container(child: WeatherCard(),),
             DashboardCardCarousel()
           ],
         ),

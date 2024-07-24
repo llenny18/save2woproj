@@ -31,7 +31,7 @@ class _TresholdChartState extends State<ThresholdChart> {
 
   Future<void> _fetchData() async {
     try {
-      final response = await http.get(Uri.parse('https://save2wo-api.vercel.app/threshold/latest/5'));
+      final response = await http.get(Uri.parse('https://save2wo-api.vercel.app/threshold'));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
