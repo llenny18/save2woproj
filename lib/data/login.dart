@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:save2woproj/model/globals.dart' as global;
 import 'dart:convert';
 import 'package:save2woproj/main.dart';
 
@@ -27,22 +28,25 @@ class _LoginScreenState extends State<LoginScreen> {
         }),
       );
 
-      // Debugging prints
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+  
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         if (data['status'] == 'authorized') {
           var firstName = data['firstName'] ?? 'Unknown';
           var lastName = data['lastName'] ?? 'User';
+          var picture = data['profile_picture'];
           var email = emailController.text;
+
+
+          setGlobals('$firstName $lastName', email,picture);
+
 
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    Panel(username: '$firstName $lastName', email: email)),
+                    const Panel()),
           );
         } else {
           _showErrorDialog(data['message'] ?? 'Unknown error');
@@ -55,13 +59,18 @@ class _LoginScreenState extends State<LoginScreen> {
       _showErrorDialog('An error occurred. Please try again.');
     }
   }
-
+  void setGlobals(String name, String email, String picture){
+    global.isLoggedIn = true;
+          global.userName = name;
+          global.email = email;
+          global.profile_pic = picture;
+  }
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title:
-            const Text('Login Failed\nKindly recheck your email and password'),
+            const Text('Invalid email or password'),
         content: Text(message),
         actions: [
           TextButton(

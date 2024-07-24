@@ -4,7 +4,8 @@ import 'package:save2woproj/components/history.dart';
 import 'package:save2woproj/model/model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'data/login.dart';
+import 'package:save2woproj/data/login.dart';
+import 'package:save2woproj/model/globals.dart' as global;
 
 void main() {
   runApp(const Home());
@@ -17,7 +18,7 @@ class DevMode extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Panel(username: 'dev_user', email: 'dev@example.com'),
+      home: Panel(),
     );
   }
 }
@@ -135,8 +136,7 @@ Widget _drawer(BuildContext context) => Drawer(
               Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => Panel(
-                          username: 'dev_user', email: 'dev@example.com')),
+                      builder: (context) => const Panel()),
                   (route) => false);
             },
             title: Text(item,
@@ -160,8 +160,7 @@ Widget _navBarItems(BuildContext context) => Row(
                 Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => Panel(
-                            username: 'dev_user', email: 'dev@example.com')),
+                        builder: (context) => Panel()),
                     (route) => false);
               },
               child: Padding(
@@ -195,6 +194,7 @@ class Logout extends StatelessWidget {
         TextButton(
           child: const Text('Yes'),
           onPressed: () {
+            global.isLoggedIn = false;
             Navigator.of(context).pop();
             Navigator.pushReplacement(
               context,
@@ -230,18 +230,19 @@ class _ProfileIcon extends StatelessWidget {
             },
           );
         } else if (item == Menu.itemOne) {
-          final panelState = context.findAncestorStateOfType<PanelState>();
-          if (panelState != null) {
+          final userName = global.userName;
+          final email = global.email;
+
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ProfileTab(
-                  username: panelState.widget.username,
-                  email: panelState.widget.email,
+                  username: userName,
+                  email: email,
                 ),
               ),
             );
-          }
+          
         }
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
@@ -275,10 +276,10 @@ class _ProfileIcon extends StatelessWidget {
 }
 
 class Panel extends StatefulWidget {
-  final String username;
-  final String email;
 
-  const Panel({required this.username, required this.email, super.key});
+
+
+  const Panel({ super.key});
   @override
   State<Panel> createState() => PanelState();
 }
@@ -451,13 +452,7 @@ class ProfileTab extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
-          image: DecorationImage(
-            image: NetworkImage(
-                'https://www.transparenttextures.com/patterns/connected.png'), // Subtle texture
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-                Colors.white.withOpacity(0.05), BlendMode.dstATop),
-          ),
+          
         ),
         padding: const EdgeInsets.all(16.0),
         child: Center(
@@ -471,11 +466,10 @@ class ProfileTab extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const CircleAvatar(
+                   CircleAvatar(
                     radius: 50,
-                    backgroundImage:
-                        NetworkImage('https://via.placeholder.com/150'),
                     backgroundColor: Colors.white,
+                    child : Image(image: NetworkImage(global.profile_pic)),
                   ),
                   SizedBox(height: 16),
                   Text(
