@@ -589,6 +589,7 @@ class StateDashboardCounter extends State<DashboardCounter> {
           }
         }
       },
-    ));
+    )
+    );
   }
 }

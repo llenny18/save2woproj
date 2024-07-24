@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:save2woproj/components/charts.dart';
-
-
-
+import 'package:save2woproj/data/contamination.dart';
+import 'package:save2woproj/data/history.dart';
 // Reference from CarouselDemo in main.dart
 class DashboardCardCarousel extends StatefulWidget {
   @override
@@ -13,21 +12,22 @@ class DashboardCardCarousel extends StatefulWidget {
 
 
 class _DashboardCardCarouselState extends State<DashboardCardCarousel> {
+  
   final CarouselController _controller = CarouselController();
   int _currentIndex = 0;
   final List<Widget> cardList = [
-    const DashboardCard(
-        title: "Lelouch Vi Britannia",
+     DashboardCard(
+        title: "Top List of Contamination",
         content:
-            "ALL HEIL LELOUCH! ALL HEIL LELOUCH! ALL HAIL GREAT BRITANNIA!",
-        image:
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTN62Y5Pm7ZRzEcpxqdyZRDrmeJZEKIi8OZAw&s"),
-    const DashboardCard(
-        title: "this is a warning",
-        content: "using -> ",
-        image:
-            "https://www.usatoday.com/gcdn/authoring/authoring-images/2023/08/25/USAT/70680172007-alertsm.png?crop=1995,1499,x52,y0"),
-    const ChartCard()
+            ContaminationList(),
+            enableImage: false,
+        ),
+       
+     DashboardCard(
+        title: "List of Fish Kill per Cage",
+        content: HistoryList(),
+       ),
+       const ChartCard()
   ];
 
   @override
@@ -56,7 +56,7 @@ class _DashboardCardCarouselState extends State<DashboardCardCarousel> {
                               initialPage: 0,
                               enableInfiniteScroll: true,
                               reverse: false,
-                              autoPlay: true,
+                              autoPlay: false,
                               autoPlayInterval: Duration(seconds: 3),
                               autoPlayAnimationDuration:
                                   Duration(milliseconds: 800),
@@ -116,8 +116,10 @@ class _DashboardCardCarouselState extends State<DashboardCardCarousel> {
 /// [innerRadius] is the radius of the [CircleAvatar] that holds the image
 class DashboardCard extends StatefulWidget {
   final String title;
-  final String content;
-  final String image;
+  final Widget content;
+  final String? image;
+
+  final bool? enableImage;
 
   final double? padding;
   final double? width;
@@ -129,7 +131,8 @@ class DashboardCard extends StatefulWidget {
       {Key? key,
       required this.title,
       required this.content,
-      required this.image,
+      this.image,
+      this.enableImage,
       this.padding,
       this.width,
       this.height,
@@ -147,12 +150,13 @@ class StateDashboardCard extends State<DashboardCard> {
     // Access the variables passed to the state
     final title = widget.title;
     final content = widget.content;
-    final image = widget.image;
+    final image = widget.image ?? "";
     final padding = widget.padding ?? 20.0;
     final height = widget.height ?? 600;
     final width = widget.width ?? 800;
     final innerRadius = widget.innerRadius ?? 50;
     final outerRadius = widget.outerRadius ?? 59;
+    final enableImage = widget.enableImage ?? false;
 
     return Card(
         elevation: 50,
@@ -167,7 +171,7 @@ class StateDashboardCard extends State<DashboardCard> {
                   children: <Widget>[
                     Row(
                       children: <Widget>[
-                        CircleAvatar(
+                        enableImage?CircleAvatar(
                           backgroundColor:
                               const Color.fromARGB(255, 43, 211, 236),
                           radius: outerRadius,
@@ -176,7 +180,10 @@ class StateDashboardCard extends State<DashboardCard> {
                                 image), // <- the image link is here
                             radius: innerRadius,
                           ),
-                        ),
+                        ) : const SizedBox(
+                            width:
+                                10)
+                        ,
                         const SizedBox(
                             width:
                                 10), // Changed from height to width for horizontal spacing
@@ -195,21 +202,14 @@ class StateDashboardCard extends State<DashboardCard> {
                                     fontFamily: 'Metropolis'),
                               ),
                               _gap(),
-                              Text(
-                                // Content goes here
-                                content,
-                                style: const TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.white,
-                                    fontFamily: 'Metropolis'),
-                              ),
-                              _gap(),
+                              
                             ],
                           ),
                         ),
                       ],
                     ),
-
+                    Expanded(child:content ,),
+                              _gap(),        
                     // ->> you can add some components here
                   ],
                 ))));
