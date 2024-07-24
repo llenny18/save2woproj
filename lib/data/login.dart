@@ -1,29 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:save2woproj/model/globals.dart' as global;
 import 'dart:convert';
 import 'package:save2woproj/main.dart';
 
-//STATEFUL WIDGET FOR THE LOGIN SCREEN
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-//STATE FOR THE LOGIN SCREEN
 class _LoginScreenState extends State<LoginScreen> {
-  //SHOW OR HIDE THE PASSWORD INPUT
   bool _isPasswordVisible = false;
-  //Key for the form
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  //Controllers for the email and password textbox
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  //function to authenticate user
   Future<void> authenticate(String email, String password) async {
     try {
-      //make the POST request to the REST API login
       final response = await http.post(
         Uri.parse('https://save2wo-api.vercel.app/login'),
         headers: <String, String>{
@@ -35,46 +28,54 @@ class _LoginScreenState extends State<LoginScreen> {
         }),
       );
 
-      // Debugging prints
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+  
 
-      //if the response is successful
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         if (data['status'] == 'authorized') {
-          //If authorized, navigate to the dashboard
+          var firstName = data['firstName'] ?? 'Unknown';
+          var lastName = data['lastName'] ?? 'User';
+          var picture = data['profile_picture'];
+          var email = emailController.text;
+
+
+          setGlobals('$firstName $lastName', email,picture);
+
+
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => Panel()),
+            MaterialPageRoute(
+                builder: (context) =>
+                    const Panel()),
           );
         } else {
-          //If not authorized, show an error message. E di wag ka maglagay ng tamang input hmp.
           _showErrorDialog(data['message'] ?? 'Unknown error');
         }
       } else {
-        // If the response was not successful, show an error dialog. Dito ako nahirapan kasi laging nag error yung promise hayst so nag try catch ako to handle the exception.
         _showErrorDialog('Failed to login. Please try again.');
       }
     } catch (e) {
-      // Catch any exceptions that occur during the authentication process
       print('Error occurred: $e');
       _showErrorDialog('An error occurred. Please try again.');
     }
   }
-
+  void setGlobals(String name, String email, String picture){
+    global.isLoggedIn = true;
+          global.userName = name;
+          global.email = email;
+          global.profile_pic = picture;
+  }
   void _showErrorDialog(String message) {
-    // Show an error dialog with the given message
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Login Failed\nKindly recheck your email and password'),
+        title:
+            const Text('Invalid email or password'),
         content: Text(message),
         actions: [
           TextButton(
-            child: Text('OK'),
+            child: const Text('OK'),
             onPressed: () {
-              // Close the dialog when the OK button is pressed
               Navigator.of(context).pop();
             },
           ),
@@ -85,7 +86,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Build the login form
     return Container(
       constraints: const BoxConstraints(maxWidth: 300),
       child: Form(
@@ -97,7 +97,6 @@ class _LoginScreenState extends State<LoginScreen> {
             TextFormField(
               controller: emailController,
               validator: (value) {
-                // Validate the email input. Feel ko kahit di na kasama to pero to show respect kay Allendog di ko na tinaggal HAHAHA pero pede sya if gagawa signin
                 if (value == null || value.isEmpty) {
                   return 'Please enter some text';
                 }
@@ -165,7 +164,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 onPressed: () {
-                  // Submit the form when the Sign in button is pressed
                   if (_formKey.currentState?.validate() ?? false) {
                     authenticate(emailController.text, passwordController.text);
                   }
