@@ -7,32 +7,23 @@ import 'package:http/http.dart' as http;
 import 'data/login.dart';
 
 void main() {
-  runApp(const DevMode());
+  runApp(const Home());
 }
 
 // For development purposes
-//
-// So you don't have to go through login screen every start or reload
-// change runApp([widget]) on deployment or if login is necessary
-// ```dart
-// void main(){
-//  runApp(const Home());
-// }
-// ```
 class DevMode extends StatelessWidget {
   const DevMode({super.key});
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(debugShowCheckedModeBanner: false, home: Panel());
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Panel(username: 'dev_user', email: 'dev@example.com'),
+    );
   }
 }
 
-/// Current index for pages
-///
-/// Value of [_index] is changed on functions onTap() located at _navBarItems and _drawer
 int _index = 0;
 
-/// This is will be the starting point of the App
 class Home extends StatelessWidget {
   const Home({super.key});
 
@@ -76,9 +67,6 @@ class Home extends StatelessWidget {
   }
 }
 
-// Components Start
-
-
 class _Logo extends StatelessWidget {
   const _Logo({super.key});
 
@@ -102,7 +90,7 @@ class _Logo extends StatelessWidget {
                     shape: BoxShape.circle,
                     image: DecorationImage(
                       fit: BoxFit.cover,
-                      image: NetworkImage('assets/save2wo.png'),
+                      image: AssetImage('assets/save2wo.png'),
                     ),
                   ),
                 ),
@@ -128,18 +116,13 @@ class _Logo extends StatelessWidget {
   }
 }
 
-/// Widgets that is accessed by [Panel()] through [_index]
 final _tabs = [Dashboard(), HistoryTab()];
-/// List of Menu Items
-/// 
-/// This is used in both _drawer and _navBar
 final List<String> _menuItems = ['Home', 'History'];
-
-/// A map that contains a list of icons associated with their corresponding names.
 final Map<String, IconData> _iconList = {
   "Home": Icons.home,
   "History": Icons.history
 };
+
 Widget _drawer(BuildContext context) => Drawer(
       backgroundColor: const Color(0xff108494),
       child: ListView(
@@ -148,17 +131,12 @@ Widget _drawer(BuildContext context) => Drawer(
           return ListTile(
             leading: Icon(icon, color: Colors.white),
             onTap: () {
-              // _menuItems.indexWhere((_item) => _item == item) returns int
-              // Whereas [_item] is our value in [_menuItems]
-              // while [item] is selected [onTap()]
-              // the [index] is returned by matching the onTapped item to our [_menuItems._item]
               _index = _menuItems.indexWhere((_item) => _item == item);
-
-              // The existing page will be replaced by [Panel()]
-              // pushAndRemoveUntil is used to prevent multiple stack of tabs running on background
               Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const Panel()),
+                  MaterialPageRoute(
+                      builder: (context) => Panel(
+                          username: 'dev_user', email: 'dev@example.com')),
                   (route) => false);
             },
             title: Text(item,
@@ -178,17 +156,12 @@ Widget _navBarItems(BuildContext context) => Row(
           .map(
             (item) => InkWell(
               onTap: () {
-                // _menuItems.indexWhere((_item) => _item == item)
-
-                // _menuItems.indexWhere((_item) => _item == item) returns int
-                //
-                // Whereas [_item] is our value in [_menuItems]
-                // while [item] is selected [onTap()]
-                // the [index] is returned by matching the onTapped item to our [_menuItems._item]
                 _index = _menuItems.indexWhere((_item) => _item == item);
                 Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => const Panel()),
+                    MaterialPageRoute(
+                        builder: (context) => Panel(
+                            username: 'dev_user', email: 'dev@example.com')),
                     (route) => false);
               },
               child: Padding(
@@ -205,16 +178,9 @@ Widget _navBarItems(BuildContext context) => Row(
           .toList(),
     );
 
-// Logout Dialog
 class Logout extends StatelessWidget {
   const Logout({super.key});
 
-// Pops a dialog prompting for logging out
-//
-// Creates two selection in [actions]
-//
-// When [TextButton.No] is pressed it will return to original position
-// When [TextButton.Yes] is pressed it will push the existing page to the Login Page
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -223,14 +189,12 @@ class Logout extends StatelessWidget {
         TextButton(
           child: const Text('No'),
           onPressed: () {
-            // Just close the dialog
             Navigator.of(context).pop();
           },
         ),
         TextButton(
           child: const Text('Yes'),
           onPressed: () {
-            // Close the dialog and navigate to Home
             Navigator.of(context).pop();
             Navigator.pushReplacement(
               context,
@@ -243,15 +207,9 @@ class Logout extends StatelessWidget {
   }
 }
 
-/// Represents the menu options available.
 enum Menu {
-  /// Represents the first item in the menu.
   itemOne,
-
-  /// Represents the second item in the menu.
   itemTwo,
-
-  /// Represents the third item in the menu.
   itemThree,
 }
 
@@ -272,11 +230,18 @@ class _ProfileIcon extends StatelessWidget {
             },
           );
         } else if (item == Menu.itemOne) {
-          // Navigate to ProfileTab
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ProfileTab()),
-          );
+          final panelState = context.findAncestorStateOfType<PanelState>();
+          if (panelState != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileTab(
+                  username: panelState.widget.username,
+                  email: panelState.widget.email,
+                ),
+              ),
+            );
+          }
         }
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
@@ -309,18 +274,13 @@ class _ProfileIcon extends StatelessWidget {
   }
 }
 
-// Components End
-
-// Tabs/Forms Start
-
-
-/// Holds the components together
-/// 
-/// Dynamically built for switching tabs
 class Panel extends StatefulWidget {
-  const Panel({super.key});
+  final String username;
+  final String email;
+
+  const Panel({required this.username, required this.email, super.key});
   @override
-  PanelState createState() => PanelState();
+  State<Panel> createState() => PanelState();
 }
 
 class PanelState extends State<Panel> {
@@ -331,69 +291,68 @@ class PanelState extends State<Panel> {
     final width = MediaQuery.of(context).size.width;
     final bool isLargeScreen = width > 800;
 
-
-
     return Theme(
       data: ThemeData.dark(),
       child: Scaffold(
-          key: _scaffoldKey,
-          appBar: AppBar(
-            backgroundColor: const Color(0xff088294),
-            elevation: 0,
-            titleSpacing: 0,
-            leading: isLargeScreen
-                ? null
-                : IconButton(
-                    icon: const Icon(Icons.menu),
-                    onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                  ),
-            title: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: NetworkImage('assets/save2wo.png'),
-                              ),
+        key: _scaffoldKey,
+        appBar: AppBar(
+          backgroundColor: const Color(0xff088294),
+          elevation: 0,
+          titleSpacing: 0,
+          leading: isLargeScreen
+              ? null
+              : IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                ),
+          title: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Container(
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: AssetImage('assets/save2wo.png'),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                  if (isLargeScreen) Expanded(child: _navBarItems(context))
-                ],
-              ),
+                ),
+                if (isLargeScreen) Expanded(child: _navBarItems(context))
+              ],
             ),
-            actions: const [
-              Padding(
-                padding: EdgeInsets.only(right: 16.0),
-                child: CircleAvatar(child: _ProfileIcon()),
-              )
-            ],
           ),
-          drawer: isLargeScreen ? null : _drawer(context),
-          backgroundColor: const Color(0xffeaf4f7),
-          body: Center(
-            child: _tabs[_index],
-          )),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: CircleAvatar(
+                child: _ProfileIcon(),
+              ),
+            )
+          ],
+        ),
+        drawer: isLargeScreen ? null : _drawer(context),
+        backgroundColor: const Color(0xffeaf4f7),
+        body: Center(
+          child: _tabs[_index],
+        ),
+      ),
     );
   }
 }
-
-
 
 class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
@@ -438,16 +397,20 @@ class Dashboard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Center(
-                    child: DashboardCounter(title: "Latest Fish Kill", countName: "Fish Kill", path: Uri.https(
-                      'save2wo-api.vercel.app','/history/fish-kill/latest'
-                    ),
+                    child: DashboardCounter(
+                      title: "Latest Fish Kill",
+                      countName: "Fish Kill",
+                      path: Uri.https('save2wo-api.vercel.app',
+                          '/history/fish-kill/latest'),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Center(
-                    child: DashboardCounter(title: "Total Fish Kill", countName: "Fish Kill", path: Uri.https(
-                      'save2wo-api.vercel.app','/history/fish-kill/total'
-                    ),
+                    child: DashboardCounter(
+                      title: "Total Fish Kill",
+                      countName: "Fish Kill",
+                      path: Uri.https(
+                          'save2wo-api.vercel.app', '/history/fish-kill/total'),
                     ),
                   ),
                 ],
@@ -462,120 +425,125 @@ class Dashboard extends StatelessWidget {
 }
 
 class ProfileTab extends StatelessWidget {
-  const ProfileTab({super.key});
+  final String username;
+  final String email;
+
+  const ProfileTab({super.key, required this.username, required this.email});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            backgroundColor: const Color(0xff088294),
-            title: const Text(
-              'Profile',
-              style: TextStyle(
-                  fontSize: 27, fontFamily: 'Montserrat', color: Colors.white),
-            )),
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.lightBlue.shade100, Colors.blue.shade900],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+      appBar: AppBar(
+        backgroundColor: const Color(0xff088294),
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            fontSize: 27,
+            fontFamily: 'Montserrat',
+            color: Colors.white,
+          ),
+        ),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.lightBlue.shade100, Colors.blue.shade900],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          image: DecorationImage(
+            image: NetworkImage(
+                'https://www.transparenttextures.com/patterns/connected.png'), // Subtle texture
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+                Colors.white.withOpacity(0.05), BlendMode.dstATop),
+          ),
+        ),
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Card(
+            elevation: 8,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            image: DecorationImage(
-              image: NetworkImage(
-                  'https://www.transparenttextures.com/patterns/connected.png'), // Subtle texture
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.05), BlendMode.dstATop),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircleAvatar(
+                    radius: 50,
+                    backgroundImage:
+                        NetworkImage('https://via.placeholder.com/150'),
+                    backgroundColor: Colors.white,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    username,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade900,
+                    ),
+                  ),
+                  Text(
+                    email,
+                    style: const TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Mahilig mangisda, mahilig din sa sha..',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    child: Text('Edit Profile'),
+                    onPressed: () {
+                      // Handle Edit Profile action
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blue.shade700,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 24.0, vertical: 12.0),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          padding: const EdgeInsets.all(16.0),
-          child: Center(
-            child: Card(
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircleAvatar(
-                      radius: 50,
-                      backgroundImage:
-                          NetworkImage('https://via.placeholder.com/150'),
-                      backgroundColor: Colors.white,
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      'Allen Batong Bakal',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade900,
-                      ),
-                    ),
-                    const Text(
-                      'AllenJutay@example.com',
-                      style: TextStyle(
-                        color: Colors.blueGrey,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Mahilig mangisda, mahilig din sa sha..',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.blueGrey,
-                        fontSize: 14,
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    ElevatedButton(
-                      child: Text('Edit Profile'),
-                      onPressed: () {
-                        // Handle Edit Profile action
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.blue.shade700,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 24.0, vertical: 12.0),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ));
+        ),
+      ),
+    );
   }
 }
-// Tabs/Form End
 
-//https://save2wo-api.vercel.app/history/fish-kill/latest
 class DashboardCounter extends StatefulWidget {
   final String countName;
   final String title;
   final Uri path;
-  const DashboardCounter({
-    super.key,
-    required this.countName,
-    required this.title,
-    required this.path
-  });
+  const DashboardCounter(
+      {super.key,
+      required this.countName,
+      required this.title,
+      required this.path});
   @override
   StateDashboardCounter createState() => StateDashboardCounter();
 }
 
 class StateDashboardCounter extends State<DashboardCounter> {
-  
   Future<History?>? history;
+
   @override
   void initState() {
     super.initState();
@@ -584,23 +552,22 @@ class StateDashboardCounter extends State<DashboardCounter> {
 
   Future<History> fetchFishKill() async {
     List<History> historyList = [];
-    // you can replace your api link with this link
-    //var uri = Uri.https('save2wo-api.vercel.app', '/history/fish-kill/latest');
     final response = await http.get(widget.path);
     if (response.statusCode == 200) {
       List<dynamic> jsonData = json.decode(response.body);
       historyList = jsonData.map((data) => History.fromJson(data)).toList();
-      return historyList[0];
+      return historyList.isNotEmpty
+          ? historyList[0]
+          : throw Exception("History list is empty");
     } else {
-      throw Exception("Object is null");
+      throw Exception("Failed to load data");
     }
   }
 
   Widget buildDataWidget(context, snapshot) => CounterCard(
-      count: snapshot.data.deadFish,
+      count: snapshot.data?.deadFish ?? 0,
       countName: widget.countName,
-      title: widget.title
-      );
+      title: widget.title);
 
   @override
   Widget build(BuildContext context) {
@@ -625,4 +592,3 @@ class StateDashboardCounter extends State<DashboardCounter> {
     ));
   }
 }
-
