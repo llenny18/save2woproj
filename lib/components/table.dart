@@ -26,6 +26,7 @@ class StateListDataTable extends State<ListDataTable> {
   Widget build(BuildContext context) {
     final columns = widget.columns;
     final rows = widget.rows;
+   
     return LayoutBuilder(
         builder: (context, constraints) => SingleChildScrollView(
           child: Container(
@@ -36,18 +37,21 @@ class StateListDataTable extends State<ListDataTable> {
                 constraints: BoxConstraints(minWidth: constraints.maxWidth),
                 child: DataTable(
                   columnSpacing: 20.0,
+                    headingRowColor: MaterialStateColor.resolveWith((states) => Color(0xffdfe6e9)),
                   columns: List<DataColumn>.generate(
                       columns.length,
                       (index) => DataColumn(
-                              label: Text(
+                              label: Text(  
                             columns[index],
                             style: const TextStyle(
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white),
+                                color: Color(0xff2d3436)),
                           ))),
                   rows: List<DataRow>.generate(
                     rows[columns[0]]!.length,
                     (index) => DataRow(
+                    
                       cells: List<DataCell>.generate(
                         /// Hi, maybe you are wondering...
                         /// How tf does this work?!

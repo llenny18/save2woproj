@@ -20,8 +20,8 @@ class StateHistoryList extends State<HistoryList>{
   late Map<int, int> values;
   List<String> cages = [];
   final List<String> columns = [
-    "Cage",
-    "Fish Kills",
+    "Cage Number",
+    "Number of Fish Kills",
     "Frequency"
   ];
   @override
@@ -78,6 +78,12 @@ class StateHistoryList extends State<HistoryList>{
         values = Map.fromEntries(sortedEntries);
       }
     }
+     Widget buildText(value)=> Text(
+    value,
+    style: TextStyle(
+      color: Color(0xff2D3436)
+    )
+  );
 Widget buildLinear(value) => LinearProgressIndicator(
         minHeight: 10,
         value: value,
@@ -98,18 +104,18 @@ Widget buildLinear(value) => LinearProgressIndicator(
             setData();
             final row = {
               columns[0] : [
-                 Text(cages[3].toString()),
-                 Text(cages[4].toString()),
-                 Text(cages[1].toString()),
-                 Text(cages[0].toString()),
-                 Text(cages[2].toString()),
+                 buildText(cages[3].toString()),
+                 buildText(cages[4].toString()),
+                 buildText(cages[1].toString()),
+                 buildText(cages[0].toString()),
+                 buildText(cages[2].toString()),
               ],
               columns[1] : [
-                Text(values[3].toString()),
-                 Text(values[5].toString()),
-                  Text(values[1].toString()),
-                   Text(values[2].toString()),
-                    Text(values[4].toString()),
+                buildText(values[3].toString()),
+                 buildText(values[5].toString()),
+                  buildText(values[1].toString()),
+                   buildText(values[2].toString()),
+                    buildText(values[4].toString()),
               ],
               columns[2] : [
                 buildLinear(values[3]!/sum),
