@@ -42,7 +42,7 @@ dependencies:
   charts_flutter: ^0.12.0
   intl: ^0.17.0 
   fl_chart: ^0.60.0
-  
+  font_awesome_flutter: ^10.7.0
 
 dev_dependencies:
   flutter_test:
