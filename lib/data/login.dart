@@ -28,8 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
         }),
       );
 
-  
-
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         if (data['status'] == 'authorized') {
@@ -38,15 +36,11 @@ class _LoginScreenState extends State<LoginScreen> {
           var picture = data['profile_picture'];
           var email = emailController.text;
 
-
-          setGlobals('$firstName $lastName', email,picture);
-
+          setGlobals('$firstName $lastName', email, picture);
 
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    const Panel()),
+            MaterialPageRoute(builder: (context) => const Panel()),
           );
         } else {
           _showErrorDialog(data['message'] ?? 'Unknown error');
@@ -59,18 +53,19 @@ class _LoginScreenState extends State<LoginScreen> {
       _showErrorDialog('An error occurred. Please try again.');
     }
   }
-  void setGlobals(String name, String email, String picture){
+
+  void setGlobals(String name, String email, String picture) {
     global.isLoggedIn = true;
-          global.userName = name;
-          global.email = email;
-          global.profile_pic = picture;
+    global.userName = name;
+    global.email = email;
+    global.profile_pic = picture;
   }
+
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title:
-            const Text('Invalid email or password'),
+        title: const Text('Invalid email or password'),
         content: Text(message),
         actions: [
           TextButton(
