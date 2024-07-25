@@ -9,9 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:save2woproj/data/login.dart';
 import 'package:save2woproj/model/globals.dart' as global;
 
-
-void main(){
-
+void main() {
   runApp(const DevMode());
 }
 
@@ -22,7 +20,236 @@ class DevMode extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Panel(),
+      home: OnBoardingScreen(),
+    );
+  }
+}
+
+
+// Start OnBorading Page Widgets
+class OnBoardingScreen extends StatefulWidget {
+  const OnBoardingScreen({super.key});
+
+  @override
+  State<OnBoardingScreen> createState() => _OnBoardingScreenState();
+}
+
+class _OnBoardingScreenState extends State<OnBoardingScreen> {
+  //Create Page Controller for Page View
+  late PageController _pageController;
+
+  //Index Tracker for Page View
+  int _PageIndex = 0;
+
+  @override
+  void initState() {
+    //Initializer of Page Controller
+    _pageController = PageController(initialPage: 0);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    //Once widget is Disposed, so is the Page Controller
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  //Function for button Press
+  void _onNextPressed() {
+    if (_PageIndex == demo_data.length - 1) {
+      // Navigate to the Home screen
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const Home()),
+      );
+    } else {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.ease,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //Check if the Screen is Smalll for size Adjustment
+    final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
+    //Calculation of the Button Size based on Screen Size
+    final double buttonSize = isSmallScreen? 40 : 60; // Adjust size proportionally
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea( //helps to avoid overlapping with the notch, holes, or rounded corners of a device's screen
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              // Take up the available space with the PageView
+              Expanded(
+                child: PageView.builder(
+                  // Set the number of pages
+                  itemCount: demo_data.length,
+                  // Set the Page Controller
+                  controller: _pageController,
+                  // Handles Page Chages
+                  onPageChanged: (index) {
+                    setState(() {
+                      _PageIndex = index;
+                    });
+                  },
+                  //Responsible for building Each Page
+                  itemBuilder: (context, index) => OnBoardContent(
+                    isSmallScreen: isSmallScreen,
+                    image: demo_data[index].image,
+                    title: demo_data[index].title,
+                    description: demo_data[index].description,
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  ...List.generate(
+                    demo_data.length, 
+                    (index) => Padding(
+                      padding: EdgeInsets.only(right: 4.0),
+                      child: DotIndicator(isActive: index == _PageIndex),
+                    ),
+                ),
+                  const Spacer(),
+                  SizedBox(
+                    height: buttonSize,
+                    width: buttonSize,
+                    child: ElevatedButton(
+                      onPressed: _onNextPressed,
+                      style: ElevatedButton.styleFrom(
+                        shape: const CircleBorder(),
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: Image.asset(
+                        "assets/Icons/Arrow - Right.png",
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// A stateless widget to display a dot indicator
+class DotIndicator extends StatelessWidget {
+  const DotIndicator({
+    super.key,
+    this.isActive = false,
+  });
+
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        height: isActive ? 12 : 4,
+        width: 4,
+        decoration: BoxDecoration(
+          color: isActive ? Color(0xff088294) : Color(0xff088294).withOpacity(0.4),
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          ));
+  }
+}
+
+class OnBoard {
+  final String image, title, description;
+
+  OnBoard(
+      {required this.image, required this.title, required this.description});
+}
+
+//List of Onboarding Data
+final List<OnBoard> demo_data = [
+  OnBoard(
+      image: "assets/illustrations/welcome.png",
+      title: "Welcome to Save2wo!",
+      description:
+          "Innovative Application that will reduce losses and multiply gains."),
+  OnBoard(
+      image: "assets/illustrations/fish.png",
+      title: "Innovative Method for keeping your Fish safe.",
+      description:
+          "Remotely keep track of the environmental condition of the Fishes."),
+  OnBoard(
+      image: "assets/illustrations/notify.png",
+      title: "Real Time notification of important updates",
+      description:
+          "Immediate notification on your device and email for important environmental updates in your fish cages"),
+  OnBoard(
+      image: "assets/illustrations/track.png",
+      title: "Tracking made easier with the app's cloud database",
+      description:
+          "Easier viewing and sorting of recorded environmental data for future maintenance of cages."),
+];
+
+class OnBoardContent extends StatelessWidget {
+  const OnBoardContent({
+    super.key,
+    required this.isSmallScreen,
+    required this.image,
+    required this.title,
+    required this.description,
+  });
+
+  final String image, title, description;
+  final bool isSmallScreen;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double screenHeight = constraints.maxHeight;
+
+        // The font sizes for the title and description based on the screen size
+        double titleFontSize = isSmallScreen ? 24 : 32;
+        double descriptionFontSize = isSmallScreen ? 16 : 20;
+
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 128),
+              Image.asset(
+                image,
+                height: isSmallScreen ? screenHeight * 0.4 : screenHeight * 0.5,
+              ),
+              const SizedBox(height: 64),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.w500,
+                        fontSize: titleFontSize,
+                        color: Colors.black,
+                      ),
+                ),
+              ),
+              const SizedBox(height: 32),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  description,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: descriptionFontSize),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -121,12 +348,12 @@ class _Logo extends StatelessWidget {
   }
 }
 
-final _tabs = [Dashboard(), HistoryTab(),ContaminationTable()];
-final List<String> _menuItems = ['Home', 'History' ,'Records'];
+final _tabs = [Dashboard(), HistoryTab(), ContaminationTable()];
+final List<String> _menuItems = ['Home', 'History', 'Records'];
 final Map<String, IconData> _iconList = {
   "Home": Icons.home,
   "History": Icons.history,
-  "Records" : Icons.list
+  "Records": Icons.list
 };
 
 Widget _drawer(BuildContext context) => Drawer(
@@ -140,8 +367,7 @@ Widget _drawer(BuildContext context) => Drawer(
               _index = _menuItems.indexWhere((_item) => _item == item);
               Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const Panel()),
+                  MaterialPageRoute(builder: (context) => const Panel()),
                   (route) => false);
             },
             title: Text(item,
@@ -164,8 +390,7 @@ Widget _navBarItems(BuildContext context) => Row(
                 _index = _menuItems.indexWhere((_item) => _item == item);
                 Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => Panel()),
+                    MaterialPageRoute(builder: (context) => Panel()),
                     (route) => false);
               },
               child: Padding(
@@ -238,16 +463,15 @@ class _ProfileIcon extends StatelessWidget {
           final userName = global.userName;
           final email = global.email;
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProfileTab(
-                  username: userName,
-                  email: email,
-                ),
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfileTab(
+                username: userName,
+                email: email,
               ),
-            );
-          
+            ),
+          );
         }
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
@@ -281,10 +505,7 @@ class _ProfileIcon extends StatelessWidget {
 }
 
 class Panel extends StatefulWidget {
-
-
-
-  const Panel({ super.key});
+  const Panel({super.key});
   @override
   State<Panel> createState() => PanelState();
 }
@@ -420,7 +641,9 @@ class Dashboard extends StatelessWidget {
                 ],
               ),
             ),
-            Container(child: WeatherCard(),),
+            Container(
+              child: WeatherCard(),
+            ),
             DashboardCardCarousel()
           ],
         ),
@@ -456,7 +679,6 @@ class ProfileTab extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
-          
         ),
         padding: const EdgeInsets.all(16.0),
         child: Center(
@@ -470,10 +692,10 @@ class ProfileTab extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                   CircleAvatar(
+                  CircleAvatar(
                     radius: 50,
                     backgroundColor: Colors.white,
-                    child : Image(image: NetworkImage(global.profile_pic)),
+                    child: Image(image: NetworkImage(global.profile_pic)),
                   ),
                   SizedBox(height: 16),
                   Text(
@@ -587,7 +809,6 @@ class StateDashboardCounter extends State<DashboardCounter> {
           }
         }
       },
-    )
-    );
+    ));
   }
 }
