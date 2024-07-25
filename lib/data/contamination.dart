@@ -28,7 +28,7 @@ class StateContaminationList extends State<ContaminationList> {
     "Dissolved Oxygen Low",
     "pH Level Unstable"
   ];
-  final List<String> columns = ["Contamination", "Hits", "Frequency"];
+  final List<String> columns = ["Contamination", "Occurrences", "Frequency"];
   Future<List<Contamination>?> fetchData() async {
     final response = await http.get(Uri.https('save2wo-api.vercel.app', '/contamination'));
     if (response.statusCode == 200) {
@@ -75,10 +75,18 @@ class StateContaminationList extends State<ContaminationList> {
     }
   }
 
+  Widget buildText(value)=> Text(
+    value,
+    style: TextStyle(
+      color: Color(0xff2D3436)
+    )
+  );
   Widget buildLinear(value) => LinearProgressIndicator(
         minHeight: 10,
+        semanticsValue: '${(value * 100).toStringAsFixed(0)}%',
         value: value,
-        valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
+        backgroundColor: Color(0xffEBF4F6),
+        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xff478CCF)),
       );
   Widget buildDataWidget(context, snapshot, row) =>
       ListDataTable(columns: columns, rows: row);
@@ -133,17 +141,17 @@ class StateContaminationList extends State<ContaminationList> {
             /// };
             /// ```
             final row = {
-              "Contamination": [
-                Text(contaminationLevels[0].toString()),
-                Text(contaminationLevels[1].toString()),
-                Text(contaminationLevels[2].toString())
+              columns[0]: [
+                buildText(contaminationLevels[0].toString()),
+                buildText(contaminationLevels[1].toString()),
+                buildText(contaminationLevels[2].toString())
               ],
-              "Hits": [
-                Text(_values[contaminationLevels[0]].toString()),
-                Text(_values[contaminationLevels[1]].toString()),
-                Text(_values[contaminationLevels[2]].toString())
+              columns[1]: [
+                buildText(_values[contaminationLevels[0]].toString()),
+                buildText(_values[contaminationLevels[1]].toString()),
+                buildText(_values[contaminationLevels[2]].toString())
               ],
-              "Frequency": [
+              columns[2]: [
                 buildLinear(_values[contaminationLevels[0]]! / sum),
                 buildLinear(_values[contaminationLevels[1]]! / sum),
                 buildLinear(_values[contaminationLevels[2]]! / sum)

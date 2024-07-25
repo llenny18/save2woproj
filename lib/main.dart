@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:save2woproj/components/card.dart';
 import 'package:save2woproj/components/history.dart';
 import 'package:save2woproj/components/contamination.dart';
@@ -640,20 +641,17 @@ class Dashboard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Center(
-                    child: DashboardCounter(
-                      title: "Latest Fish Kill",
-                      countName: "Fish Kill",
-                      path: Uri.https('save2wo-api.vercel.app',
-                          '/history/fish-kill/latest'),
+                    child: DashboardCounter(title: "Latest Fish Kill", countName: "Fish Kill", path: Uri.https(
+                      'save2wo-api.vercel.app','/history/fish-kill/latest'
+                    ),icon: FontAwesomeIcons.clockRotateLeft
                     ),
                   ),
                   const SizedBox(width: 16),
                   Center(
-                    child: DashboardCounter(
-                      title: "Total Fish Kill",
-                      countName: "Fish Kill",
-                      path: Uri.https(
-                          'save2wo-api.vercel.app', '/history/fish-kill/total'),
+                    child: DashboardCounter(title: "Total Fish Kill", countName: "Fish Kill", path: Uri.https(
+                      'save2wo-api.vercel.app','/history/fish-kill/total'
+                    ),
+                    icon: FontAwesomeIcons.chartPie,
                     ),
                   ),
                 ],
@@ -773,11 +771,14 @@ class DashboardCounter extends StatefulWidget {
   final String countName;
   final String title;
   final Uri path;
-  const DashboardCounter(
-      {super.key,
-      required this.countName,
-      required this.title,
-      required this.path});
+  final IconData icon;
+  const DashboardCounter({
+    super.key,
+    required this.countName,
+    required this.title,
+    required this.path,
+    required this.icon
+  });
   @override
   StateDashboardCounter createState() => StateDashboardCounter();
 }
@@ -808,7 +809,9 @@ class StateDashboardCounter extends State<DashboardCounter> {
   Widget buildDataWidget(context, snapshot) => CounterCard(
       count: snapshot.data?.deadFish ?? 0,
       countName: widget.countName,
-      title: widget.title);
+      title: widget.title,
+      icon: widget.icon
+      );
 
   @override
   Widget build(BuildContext context) {
