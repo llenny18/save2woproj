@@ -361,51 +361,68 @@ Widget _drawer(BuildContext context) => Drawer(
       child: ListView(
         children: _menuItems.map((item) {
           IconData icon = _iconList[item] ?? Icons.help;
-          return ListTile(
-            leading: Icon(icon, color: Colors.white),
-            onTap: () {
-              _index = _menuItems.indexWhere((_item) => _item == item);
-              Navigator.pushAndRemoveUntil(
+          int itemIndex = _menuItems.indexWhere((_item) => _item == item);
+          return Container(
+            decoration: BoxDecoration(
+              color: _index == itemIndex ? const Color(0xff095f6f) : Colors.transparent,
+              borderRadius: const BorderRadius.only(topRight: Radius.circular(10.0), bottomRight: Radius.circular(40.0)),
+            ),
+            child: ListTile(
+              leading: Icon(icon, color: Colors.white),
+              onTap: () {
+                _index = itemIndex;
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const Panel()),
                   (route) => false);
-            },
-            title: Text(item,
-                style: const TextStyle(
-                    fontSize: 27,
-                    fontFamily: 'Montserrat',
-                    color: Colors.white)),
+              },
+              title: Text(item,
+                  style: const TextStyle(
+                      fontSize: 27,
+                      fontFamily: 'Montserrat',
+                      color: Colors.white)),
+            ),
           );
         }).toList(),
       ),
     );
+
 
 Widget _navBarItems(BuildContext context) => Row(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: _menuItems
           .map(
-            (item) => InkWell(
-              onTap: () {
-                _index = _menuItems.indexWhere((_item) => _item == item);
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => Panel()),
-                    (route) => false);
-              },
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16),
-                child: Text(
-                  item,
-                  style:
-                      const TextStyle(fontSize: 22, fontFamily: 'Montserrat'),
+
+            (item) => Material(
+              color: _index == _menuItems.indexWhere((_item) => _item == item) ? const Color(0xff095f6f) : Colors.transparent, // Set your desired background color here
+              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(35.0), bottomRight: Radius.circular(35.0)),
+              child: InkWell(
+                onTap: () {
+                  _index = _menuItems.indexWhere((_item) => _item == item);
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Panel()),
+                      (route) => false);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16),
+                  child: Text(
+                    item,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontFamily: 'Montserrat',
+                    ),
+                  ),
+
                 ),
               ),
             ),
           )
           .toList(),
     );
+
 
 class Logout extends StatelessWidget {
   const Logout({super.key});
@@ -450,6 +467,7 @@ class _ProfileIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupMenuButton<Menu>(
       icon: const Icon(Icons.person),
+      color: Color(0xff063338),
       offset: const Offset(0, 40),
       onSelected: (Menu item) {
         if (item == Menu.itemThree) {
@@ -565,7 +583,7 @@ class PanelState extends State<Panel> {
             actions: const [
               Padding(
                 padding: EdgeInsets.only(right: 16.0),
-                child: CircleAvatar(child: _ProfileIcon()),
+                child: CircleAvatar(child: _ProfileIcon(), backgroundColor: Color(0xff024c56)),
               )
             ],
           ),
@@ -609,7 +627,7 @@ class Dashboard extends StatelessWidget {
                     style: TextStyle(
                       color: Color(0xff034c57),
                       fontFamily: 'Montserrat',
-                      fontSize: size.height * 0.01,
+                      fontSize: size.height * 0.02,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -662,6 +680,7 @@ class ProfileTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        
         backgroundColor: const Color(0xff088294),
         title: const Text(
           'Profile',
@@ -671,11 +690,12 @@ class ProfileTab extends StatelessWidget {
             color: Colors.white,
           ),
         ),
+        
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.lightBlue.shade100, Colors.blue.shade900],
+            colors: [Colors.white, Color.fromARGB(255, 240,244,244)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -684,6 +704,7 @@ class ProfileTab extends StatelessWidget {
         child: Center(
           child: Card(
             elevation: 8,
+            color:Color(0xff108494),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -709,8 +730,8 @@ class ProfileTab extends StatelessWidget {
                   Text(
                     email,
                     style: const TextStyle(
-                      color: Colors.blueGrey,
-                      fontSize: 16,
+                      color: Colors.white,
+                      fontSize: 24,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -718,19 +739,19 @@ class ProfileTab extends StatelessWidget {
                     'Mahilig mangisda, mahilig din sa sha..',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.blueGrey,
-                      fontSize: 14,
+                      color: Colors.white,
+                      fontSize: 20,
                     ),
                   ),
                   SizedBox(height: 16),
                   ElevatedButton(
-                    child: Text('Edit Profile'),
+                    child: Text('Edit Profile', style: TextStyle(fontSize: 15),),
                     onPressed: () {
                       // Handle Edit Profile action
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Colors.blue.shade700,
+                      backgroundColor: Color(0xff186474),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
