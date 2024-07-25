@@ -42,6 +42,7 @@ dependencies:
   charts_flutter: ^0.12.0
   intl: ^0.17.0 
   fl_chart: ^0.60.0
+  flutter_svg: ^2.0.10+1
   
 
 dev_dependencies:
@@ -70,6 +71,12 @@ flutter:
   assets:
      - assets/
      - assets/placeholder.jpg
+     - assets/illustrations/fish.png
+     - assets/illustrations/notify.png
+     - assets/illustrations/track.png
+     - assets/illustrations/welcome.png
+     - assets/Icons/Arrow - Right.png
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -99,6 +106,12 @@ flutter:
     - family: Metropolis
       fonts:
         - asset: assets/fonts/Metropolis-Regular.otf
+    
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Bold.ttf
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Medium.ttf
     
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
