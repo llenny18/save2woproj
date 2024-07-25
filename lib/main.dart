@@ -8,6 +8,7 @@ import 'package:save2woproj/model/model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:save2woproj/data/login.dart';
+import 'package:save2woproj/data/changepassword.dart';
 import 'package:save2woproj/model/globals.dart' as global;
 
 void main() {
@@ -25,7 +26,6 @@ class DevMode extends StatelessWidget {
     );
   }
 }
-
 
 // Start OnBorading Page Widgets
 class OnBoardingScreen extends StatefulWidget {
@@ -76,11 +76,13 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     //Check if the Screen is Smalll for size Adjustment
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
     //Calculation of the Button Size based on Screen Size
-    final double buttonSize = isSmallScreen? 40 : 60; // Adjust size proportionally
+    final double buttonSize =
+        isSmallScreen ? 40 : 60; // Adjust size proportionally
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea( //helps to avoid overlapping with the notch, holes, or rounded corners of a device's screen
+      body: SafeArea(
+        //helps to avoid overlapping with the notch, holes, or rounded corners of a device's screen
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -110,12 +112,12 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               Row(
                 children: [
                   ...List.generate(
-                    demo_data.length, 
+                    demo_data.length,
                     (index) => Padding(
                       padding: EdgeInsets.only(right: 4.0),
                       child: DotIndicator(isActive: index == _PageIndex),
                     ),
-                ),
+                  ),
                   const Spacer(),
                   SizedBox(
                     height: buttonSize,
@@ -157,9 +159,10 @@ class DotIndicator extends StatelessWidget {
         height: isActive ? 12 : 4,
         width: 4,
         decoration: BoxDecoration(
-          color: isActive ? Color(0xff088294) : Color(0xff088294).withOpacity(0.4),
+          color:
+              isActive ? Color(0xff088294) : Color(0xff088294).withOpacity(0.4),
           borderRadius: const BorderRadius.all(Radius.circular(12)),
-          ));
+        ));
   }
 }
 
@@ -365,17 +368,21 @@ Widget _drawer(BuildContext context) => Drawer(
           int itemIndex = _menuItems.indexWhere((_item) => _item == item);
           return Container(
             decoration: BoxDecoration(
-              color: _index == itemIndex ? const Color(0xff095f6f) : Colors.transparent,
-              borderRadius: const BorderRadius.only(topRight: Radius.circular(10.0), bottomRight: Radius.circular(40.0)),
+              color: _index == itemIndex
+                  ? const Color(0xff095f6f)
+                  : Colors.transparent,
+              borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(10.0),
+                  bottomRight: Radius.circular(40.0)),
             ),
             child: ListTile(
               leading: Icon(icon, color: Colors.white),
               onTap: () {
                 _index = itemIndex;
                 Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Panel()),
-                  (route) => false);
+                    context,
+                    MaterialPageRoute(builder: (context) => const Panel()),
+                    (route) => false);
               },
               title: Text(item,
                   style: const TextStyle(
@@ -388,27 +395,30 @@ Widget _drawer(BuildContext context) => Drawer(
       ),
     );
 
-
 Widget _navBarItems(BuildContext context) => Row(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: _menuItems
           .map(
-
             (item) => Material(
-              color: _index == _menuItems.indexWhere((_item) => _item == item) ? const Color(0xff095f6f) : Colors.transparent, // Set your desired background color here
-              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(35.0), bottomRight: Radius.circular(35.0)),
+              color: _index == _menuItems.indexWhere((_item) => _item == item)
+                  ? const Color(0xff095f6f)
+                  : Colors
+                      .transparent, // Set your desired background color here
+              borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(35.0),
+                  bottomRight: Radius.circular(35.0)),
               child: InkWell(
                 onTap: () {
                   _index = _menuItems.indexWhere((_item) => _item == item);
                   Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => Panel()),
+                      MaterialPageRoute(builder: (context) => Panel()),
                       (route) => false);
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 24.0, horizontal: 16),
                   child: Text(
                     item,
                     style: const TextStyle(
@@ -416,14 +426,12 @@ Widget _navBarItems(BuildContext context) => Row(
                       fontFamily: 'Montserrat',
                     ),
                   ),
-
                 ),
               ),
             ),
           )
           .toList(),
     );
-
 
 class Logout extends StatelessWidget {
   const Logout({super.key});
@@ -479,16 +487,23 @@ class _ProfileIcon extends StatelessWidget {
             },
           );
         } else if (item == Menu.itemOne) {
-          final userName = global.userName;
-          final email = global.email;
+          final username = global.userName;
+          final emailie = global.email;
 
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => ProfileTab(
-                username: userName,
-                email: email,
+                username: username,
+                email: emailie,
               ),
+            ),
+          );
+        } else if (item == Menu.itemTwo) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChangePasswordScreen(),
             ),
           );
         }
@@ -506,7 +521,7 @@ class _ProfileIcon extends StatelessWidget {
           value: Menu.itemTwo,
           child: ListTile(
             leading: Icon(Icons.settings, color: Colors.white),
-            title: Text('Settings',
+            title: Text('Change Password',
                 style: TextStyle(fontSize: 16, fontFamily: 'Montserrat')),
           ),
         ),
@@ -584,7 +599,8 @@ class PanelState extends State<Panel> {
             actions: const [
               Padding(
                 padding: EdgeInsets.only(right: 16.0),
-                child: CircleAvatar(child: _ProfileIcon(), backgroundColor: Color(0xff024c56)),
+                child: CircleAvatar(
+                    child: _ProfileIcon(), backgroundColor: Color(0xff024c56)),
               )
             ],
           ),
@@ -678,7 +694,6 @@ class ProfileTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        
         backgroundColor: const Color(0xff088294),
         title: const Text(
           'Profile',
@@ -688,12 +703,11 @@ class ProfileTab extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, Color.fromARGB(255, 240,244,244)],
+            colors: [Colors.white, Color.fromARGB(255, 240, 244, 244)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -702,7 +716,7 @@ class ProfileTab extends StatelessWidget {
         child: Center(
           child: Card(
             elevation: 8,
-            color:Color(0xff108494),
+            color: Color(0xff108494),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -743,7 +757,10 @@ class ProfileTab extends StatelessWidget {
                   ),
                   SizedBox(height: 16),
                   ElevatedButton(
-                    child: Text('Edit Profile', style: TextStyle(fontSize: 15),),
+                    child: Text(
+                      'Edit Profile',
+                      style: TextStyle(fontSize: 15),
+                    ),
                     onPressed: () {
                       // Handle Edit Profile action
                     },
