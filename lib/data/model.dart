@@ -1,3 +1,28 @@
+class Contamination{
+  final int cage;
+  final DateTime timestamp;
+  final WaterQuality waterQuality;
+  final String contamination;
+
+  Contamination({
+    required this.cage,
+    required this.timestamp,
+    required this.waterQuality,
+    required this.contamination,
+  });
+
+  factory Contamination.fromJson(Map<String, dynamic> json) {
+    return Contamination(
+      contamination: json['contamination'] ?? '',
+      timestamp: DateTime.fromMillisecondsSinceEpoch(
+        json['timestamp']['seconds'] * 1000,
+      ),
+      waterQuality: WaterQuality.fromJson(json['water_quality']),
+      cage: json['cage'] ?? 0,
+    );
+  }
+}
+
 class ThresholdList {
   final DateTime timestamp;
   final String status;
@@ -76,8 +101,3 @@ class WaterQuality {
     );
   }
 }
-
-
-
-
-

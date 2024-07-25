@@ -2,41 +2,261 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:save2woproj/components/card.dart';
 import 'package:save2woproj/components/history.dart';
+import 'package:save2woproj/components/contamination.dart';
 import 'package:save2woproj/components/weather.dart';
 import 'package:save2woproj/model/model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'data/login.dart';
+import 'package:save2woproj/data/login.dart';
+import 'package:save2woproj/model/globals.dart' as global;
 
-
-void main(){
-
+void main() {
   runApp(const DevMode());
 }
 
 // For development purposes
-//
-// So you don't have to go through login screen every start or reload
-// change runApp([widget]) on deployment or if login is necessary
-// ```dart
-// void main(){
-//  runApp(const Home());
-// }
-// ```
 class DevMode extends StatelessWidget {
   const DevMode({super.key});
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(debugShowCheckedModeBanner: false, home: Panel());
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: OnBoardingScreen(),
+    );
   }
 }
 
-/// Current index for pages
-///
-/// Value of [_index] is changed on functions onTap() located at _navBarItems and _drawer
+
+// Start OnBorading Page Widgets
+class OnBoardingScreen extends StatefulWidget {
+  const OnBoardingScreen({super.key});
+
+  @override
+  State<OnBoardingScreen> createState() => _OnBoardingScreenState();
+}
+
+class _OnBoardingScreenState extends State<OnBoardingScreen> {
+  //Create Page Controller for Page View
+  late PageController _pageController;
+
+  //Index Tracker for Page View
+  int _PageIndex = 0;
+
+  @override
+  void initState() {
+    //Initializer of Page Controller
+    _pageController = PageController(initialPage: 0);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    //Once widget is Disposed, so is the Page Controller
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  //Function for button Press
+  void _onNextPressed() {
+    if (_PageIndex == demo_data.length - 1) {
+      // Navigate to the Home screen
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const Home()),
+      );
+    } else {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.ease,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //Check if the Screen is Smalll for size Adjustment
+    final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
+    //Calculation of the Button Size based on Screen Size
+    final double buttonSize = isSmallScreen? 40 : 60; // Adjust size proportionally
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea( //helps to avoid overlapping with the notch, holes, or rounded corners of a device's screen
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              // Take up the available space with the PageView
+              Expanded(
+                child: PageView.builder(
+                  // Set the number of pages
+                  itemCount: demo_data.length,
+                  // Set the Page Controller
+                  controller: _pageController,
+                  // Handles Page Chages
+                  onPageChanged: (index) {
+                    setState(() {
+                      _PageIndex = index;
+                    });
+                  },
+                  //Responsible for building Each Page
+                  itemBuilder: (context, index) => OnBoardContent(
+                    isSmallScreen: isSmallScreen,
+                    image: demo_data[index].image,
+                    title: demo_data[index].title,
+                    description: demo_data[index].description,
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  ...List.generate(
+                    demo_data.length, 
+                    (index) => Padding(
+                      padding: EdgeInsets.only(right: 4.0),
+                      child: DotIndicator(isActive: index == _PageIndex),
+                    ),
+                ),
+                  const Spacer(),
+                  SizedBox(
+                    height: buttonSize,
+                    width: buttonSize,
+                    child: ElevatedButton(
+                      onPressed: _onNextPressed,
+                      style: ElevatedButton.styleFrom(
+                        shape: const CircleBorder(),
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: Image.asset(
+                        "assets/Icons/Arrow - Right.png",
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// A stateless widget to display a dot indicator
+class DotIndicator extends StatelessWidget {
+  const DotIndicator({
+    super.key,
+    this.isActive = false,
+  });
+
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        height: isActive ? 12 : 4,
+        width: 4,
+        decoration: BoxDecoration(
+          color: isActive ? Color(0xff088294) : Color(0xff088294).withOpacity(0.4),
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          ));
+  }
+}
+
+class OnBoard {
+  final String image, title, description;
+
+  OnBoard(
+      {required this.image, required this.title, required this.description});
+}
+
+//List of Onboarding Data
+final List<OnBoard> demo_data = [
+  OnBoard(
+      image: "assets/illustrations/welcome.png",
+      title: "Welcome to Save2wo!",
+      description:
+          "Innovative Application that will reduce losses and multiply gains."),
+  OnBoard(
+      image: "assets/illustrations/fish.png",
+      title: "Innovative Method for keeping your Fish safe.",
+      description:
+          "Remotely keep track of the environmental condition of the Fishes."),
+  OnBoard(
+      image: "assets/illustrations/notify.png",
+      title: "Real Time notification of important updates",
+      description:
+          "Immediate notification on your device and email for important environmental updates in your fish cages"),
+  OnBoard(
+      image: "assets/illustrations/track.png",
+      title: "Tracking made easier with the app's cloud database",
+      description:
+          "Easier viewing and sorting of recorded environmental data for future maintenance of cages."),
+];
+
+class OnBoardContent extends StatelessWidget {
+  const OnBoardContent({
+    super.key,
+    required this.isSmallScreen,
+    required this.image,
+    required this.title,
+    required this.description,
+  });
+
+  final String image, title, description;
+  final bool isSmallScreen;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double screenHeight = constraints.maxHeight;
+
+        // The font sizes for the title and description based on the screen size
+        double titleFontSize = isSmallScreen ? 24 : 32;
+        double descriptionFontSize = isSmallScreen ? 16 : 20;
+
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 128),
+              Image.asset(
+                image,
+                height: isSmallScreen ? screenHeight * 0.4 : screenHeight * 0.5,
+              ),
+              const SizedBox(height: 64),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.w500,
+                        fontSize: titleFontSize,
+                        color: Colors.black,
+                      ),
+                ),
+              ),
+              const SizedBox(height: 32),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  description,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: descriptionFontSize),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
 int _index = 0;
 
-/// This is will be the starting point of the App
 class Home extends StatelessWidget {
   const Home({super.key});
 
@@ -79,9 +299,6 @@ class Home extends StatelessWidget {
     );
   }
 }
-
-// Components Start
-
 
 class _Logo extends StatelessWidget {
   const _Logo({super.key});
@@ -132,76 +349,74 @@ class _Logo extends StatelessWidget {
   }
 }
 
-/// Widgets that is accessed by [Panel()] through [_index]
-final _tabs = [Dashboard(), HistoryTab()];
-/// List of Menu Items
-/// 
-/// This is used in both _drawer and _navBar
-final List<String> _menuItems = ['Home', 'History'];
-
-/// A map that contains a list of icons associated with their corresponding names.
+final _tabs = [Dashboard(), HistoryTab(), ContaminationTable()];
+final List<String> _menuItems = ['Home', 'History', 'Records'];
 final Map<String, IconData> _iconList = {
   "Home": Icons.home,
-  "History": Icons.history
+  "History": Icons.history,
+  "Records": Icons.list
 };
+
 Widget _drawer(BuildContext context) => Drawer(
       backgroundColor: const Color(0xff108494),
       child: ListView(
         children: _menuItems.map((item) {
           IconData icon = _iconList[item] ?? Icons.help;
-          return ListTile(
-            leading: Icon(icon, color: Colors.white),
-            onTap: () {
-              // _menuItems.indexWhere((_item) => _item == item) returns int
-              // Whereas [_item] is our value in [_menuItems]
-              // while [item] is selected [onTap()]
-              // the [index] is returned by matching the onTapped item to our [_menuItems._item]
-              _index = _menuItems.indexWhere((_item) => _item == item);
-
-              // The existing page will be replaced by [Panel()]
-              // pushAndRemoveUntil is used to prevent multiple stack of tabs running on background
-              Navigator.pushAndRemoveUntil(
+          int itemIndex = _menuItems.indexWhere((_item) => _item == item);
+          return Container(
+            decoration: BoxDecoration(
+              color: _index == itemIndex ? const Color(0xff095f6f) : Colors.transparent,
+              borderRadius: const BorderRadius.only(topRight: Radius.circular(10.0), bottomRight: Radius.circular(40.0)),
+            ),
+            child: ListTile(
+              leading: Icon(icon, color: Colors.white),
+              onTap: () {
+                _index = itemIndex;
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const Panel()),
                   (route) => false);
-            },
-            title: Text(item,
-                style: const TextStyle(
-                    fontSize: 27,
-                    fontFamily: 'Montserrat',
-                    color: Colors.white)),
+              },
+              title: Text(item,
+                  style: const TextStyle(
+                      fontSize: 27,
+                      fontFamily: 'Montserrat',
+                      color: Colors.white)),
+            ),
           );
         }).toList(),
       ),
     );
+
 
 Widget _navBarItems(BuildContext context) => Row(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: _menuItems
           .map(
-            (item) => InkWell(
-              onTap: () {
-                // _menuItems.indexWhere((_item) => _item == item)
 
-                // _menuItems.indexWhere((_item) => _item == item) returns int
-                //
-                // Whereas [_item] is our value in [_menuItems]
-                // while [item] is selected [onTap()]
-                // the [index] is returned by matching the onTapped item to our [_menuItems._item]
-                _index = _menuItems.indexWhere((_item) => _item == item);
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Panel()),
-                    (route) => false);
-              },
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16),
-                child: Text(
-                  item,
-                  style:
-                      const TextStyle(fontSize: 22, fontFamily: 'Montserrat'),
+            (item) => Material(
+              color: _index == _menuItems.indexWhere((_item) => _item == item) ? const Color(0xff095f6f) : Colors.transparent, // Set your desired background color here
+              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(35.0), bottomRight: Radius.circular(35.0)),
+              child: InkWell(
+                onTap: () {
+                  _index = _menuItems.indexWhere((_item) => _item == item);
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Panel()),
+                      (route) => false);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16),
+                  child: Text(
+                    item,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontFamily: 'Montserrat',
+                    ),
+                  ),
+
                 ),
               ),
             ),
@@ -209,16 +424,10 @@ Widget _navBarItems(BuildContext context) => Row(
           .toList(),
     );
 
-// Logout Dialog
+
 class Logout extends StatelessWidget {
   const Logout({super.key});
 
-// Pops a dialog prompting for logging out
-//
-// Creates two selection in [actions]
-//
-// When [TextButton.No] is pressed it will return to original position
-// When [TextButton.Yes] is pressed it will push the existing page to the Login Page
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -227,14 +436,13 @@ class Logout extends StatelessWidget {
         TextButton(
           child: const Text('No'),
           onPressed: () {
-            // Just close the dialog
             Navigator.of(context).pop();
           },
         ),
         TextButton(
           child: const Text('Yes'),
           onPressed: () {
-            // Close the dialog and navigate to Home
+            global.isLoggedIn = false;
             Navigator.of(context).pop();
             Navigator.pushReplacement(
               context,
@@ -247,15 +455,9 @@ class Logout extends StatelessWidget {
   }
 }
 
-/// Represents the menu options available.
 enum Menu {
-  /// Represents the first item in the menu.
   itemOne,
-
-  /// Represents the second item in the menu.
   itemTwo,
-
-  /// Represents the third item in the menu.
   itemThree,
 }
 
@@ -266,6 +468,7 @@ class _ProfileIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupMenuButton<Menu>(
       icon: const Icon(Icons.person),
+      color: Color(0xff063338),
       offset: const Offset(0, 40),
       onSelected: (Menu item) {
         if (item == Menu.itemThree) {
@@ -276,10 +479,17 @@ class _ProfileIcon extends StatelessWidget {
             },
           );
         } else if (item == Menu.itemOne) {
-          // Navigate to ProfileTab
+          final userName = global.userName;
+          final email = global.email;
+
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const ProfileTab()),
+            MaterialPageRoute(
+              builder: (context) => ProfileTab(
+                username: userName,
+                email: email,
+              ),
+            ),
           );
         }
       },
@@ -313,18 +523,10 @@ class _ProfileIcon extends StatelessWidget {
   }
 }
 
-// Components End
-
-// Tabs/Forms Start
-
-
-/// Holds the components together
-/// 
-/// Dynamically built for switching tabs
 class Panel extends StatefulWidget {
   const Panel({super.key});
   @override
-  PanelState createState() => PanelState();
+  State<Panel> createState() => PanelState();
 }
 
 class PanelState extends State<Panel> {
@@ -334,8 +536,6 @@ class PanelState extends State<Panel> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final bool isLargeScreen = width > 800;
-
-
 
     return Theme(
       data: ThemeData.dark(),
@@ -384,7 +584,7 @@ class PanelState extends State<Panel> {
             actions: const [
               Padding(
                 padding: EdgeInsets.only(right: 16.0),
-                child: CircleAvatar(child: _ProfileIcon()),
+                child: CircleAvatar(child: _ProfileIcon(), backgroundColor: Color(0xff024c56)),
               )
             ],
           ),
@@ -396,8 +596,6 @@ class PanelState extends State<Panel> {
     );
   }
 }
-
-
 
 class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
@@ -430,7 +628,7 @@ class Dashboard extends StatelessWidget {
                     style: TextStyle(
                       color: Color(0xff034c57),
                       fontFamily: 'Montserrat',
-                      fontSize: size.height * 0.01,
+                      fontSize: size.height * 0.02,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -459,7 +657,9 @@ class Dashboard extends StatelessWidget {
                 ],
               ),
             ),
-            Container(child: WeatherCard(),),
+            Container(
+              child: WeatherCard(),
+            ),
             DashboardCardCarousel()
           ],
         ),
@@ -469,103 +669,104 @@ class Dashboard extends StatelessWidget {
 }
 
 class ProfileTab extends StatelessWidget {
-  const ProfileTab({super.key});
+  final String username;
+  final String email;
+
+  const ProfileTab({super.key, required this.username, required this.email});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            backgroundColor: const Color(0xff088294),
-            title: const Text(
-              'Profile',
-              style: TextStyle(
-                  fontSize: 27, fontFamily: 'Montserrat', color: Colors.white),
-            )),
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.lightBlue.shade100, Colors.blue.shade900],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            image: DecorationImage(
-              image: NetworkImage(
-                  'https://www.transparenttextures.com/patterns/connected.png'), // Subtle texture
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.05), BlendMode.dstATop),
-            ),
+      appBar: AppBar(
+        
+        backgroundColor: const Color(0xff088294),
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            fontSize: 27,
+            fontFamily: 'Montserrat',
+            color: Colors.white,
           ),
-          padding: const EdgeInsets.all(16.0),
-          child: Center(
-            child: Card(
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircleAvatar(
-                      radius: 50,
-                      backgroundImage:
-                          NetworkImage('https://via.placeholder.com/150'),
-                      backgroundColor: Colors.white,
+        ),
+        
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Color.fromARGB(255, 240,244,244)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Card(
+            elevation: 8,
+            color:Color(0xff108494),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.white,
+                    child: Image(image: NetworkImage(global.profile_pic)),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    username,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade900,
                     ),
-                    SizedBox(height: 16),
-                    Text(
-                      'Allen Batong Bakal',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade900,
+                  ),
+                  Text(
+                    email,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Mahilig mangisda, mahilig din sa sha..',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    child: Text('Edit Profile', style: TextStyle(fontSize: 15),),
+                    onPressed: () {
+                      // Handle Edit Profile action
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Color(0xff186474),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 24.0, vertical: 12.0),
                     ),
-                    const Text(
-                      'AllenJutay@example.com',
-                      style: TextStyle(
-                        color: Colors.blueGrey,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Mahilig mangisda, mahilig din sa sha..',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.blueGrey,
-                        fontSize: 14,
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    ElevatedButton(
-                      child: Text('Edit Profile'),
-                      onPressed: () {
-                        // Handle Edit Profile action
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.blue.shade700,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 24.0, vertical: 12.0),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
-// Tabs/Form End
 
-//https://save2wo-api.vercel.app/history/fish-kill/latest
 class DashboardCounter extends StatefulWidget {
   final String countName;
   final String title;
@@ -583,8 +784,8 @@ class DashboardCounter extends StatefulWidget {
 }
 
 class StateDashboardCounter extends State<DashboardCounter> {
-  
   Future<History?>? history;
+
   @override
   void initState() {
     super.initState();
@@ -593,20 +794,20 @@ class StateDashboardCounter extends State<DashboardCounter> {
 
   Future<History> fetchFishKill() async {
     List<History> historyList = [];
-    // you can replace your api link with this link
-    //var uri = Uri.https('save2wo-api.vercel.app', '/history/fish-kill/latest');
     final response = await http.get(widget.path);
     if (response.statusCode == 200) {
       List<dynamic> jsonData = json.decode(response.body);
       historyList = jsonData.map((data) => History.fromJson(data)).toList();
-      return historyList[0];
+      return historyList.isNotEmpty
+          ? historyList[0]
+          : throw Exception("History list is empty");
     } else {
-      throw Exception("Object is null");
+      throw Exception("Failed to load data");
     }
   }
 
   Widget buildDataWidget(context, snapshot) => CounterCard(
-      count: snapshot.data.deadFish,
+      count: snapshot.data?.deadFish ?? 0,
       countName: widget.countName,
       title: widget.title,
       icon: widget.icon
@@ -632,8 +833,6 @@ class StateDashboardCounter extends State<DashboardCounter> {
           }
         }
       },
-    )
-    );
+    ));
   }
 }
-
