@@ -1,3 +1,4 @@
+import 'package:save2woproj/components/card.dart';
 import 'package:save2woproj/model/model.dart';
 import 'package:flutter/material.dart';
 import 'package:save2woproj/components/table.dart';
@@ -37,6 +38,7 @@ class StateContaminationList extends State<ContaminationList> {
           data.map((json) => Contamination.fromJson(json)).toList();
       return _contamination;
     }
+    return null;
   }
 
   /// Aggregates the data by counting the occurrences of a specific contamination value.
@@ -92,11 +94,12 @@ class StateContaminationList extends State<ContaminationList> {
       ListDataTable(columns: columns, rows: row);
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return FutureBuilder<List<Contamination>?>(
       future: con,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return  LoadingCard(width: size.width ,height: size.height, scale: const Scale(heightPercent: 1,widthPercent: 1),padding: 0,removeRadius: true,);
         } else if (snapshot.connectionState == ConnectionState.none) {
           return Container();
         } else {

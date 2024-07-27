@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:save2woproj/components/card.dart';
+
 
 class WeatherCard extends StatefulWidget {
   @override
@@ -117,7 +119,7 @@ class StateWeatherCard extends State<WeatherCard> {
         future: _weather,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return  LoadingCard(width: size.width, height: 200, scale: Scale(heightPercent: 0.22,widthPercent: 1));
           } else if (snapshot.connectionState == ConnectionState.none) {
             return Container();
           } else {
