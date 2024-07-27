@@ -9,10 +9,33 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:save2woproj/data/login.dart';
 import 'package:save2woproj/model/globals.dart' as global;
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const DevMode());
+Future<void> main() async {
+  // Ensure Flutter framework is initialized
+  WidgetsFlutterBinding.ensureInitialized();
+  // Perform any asynchronous operations here
+  final prefs = await SharedPreferences.getInstance();
+  bool? onboardingComplete = prefs.getBool('onboardingComplete');
+
+  runApp(MyApp(onboardingComplete: onboardingComplete ?? false));
 }
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key,required this.onboardingComplete});
+final bool onboardingComplete;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'save2wo',
+      debugShowCheckedModeBanner: false,
+      home: onboardingComplete ? const _LoginScreen() : const OnBoardingScreen(),
+    );
+  }
+}
+
+
 
 // For development purposes
 class DevMode extends StatelessWidget {
@@ -25,7 +48,6 @@ class DevMode extends StatelessWidget {
     );
   }
 }
-
 
 // Start OnBorading Page Widgets
 class OnBoardingScreen extends StatefulWidget {
@@ -57,11 +79,15 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   }
 
   //Function for button Press
-  void _onNextPressed() {
+  void _onNextPressed() async {
     if (_PageIndex == demo_data.length - 1) {
+      final prefs = await SharedPreferences.getInstance();
+      //sets the onboarding to true
+      prefs.setBool('onboardingComplete', true);
+      print(prefs.getBool('onBoardingComplete'));
       // Navigate to the Home screen
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const Home()),
+        MaterialPageRoute(builder: (context) => const _LoginScreen()),
       );
     } else {
       _pageController.nextPage(
@@ -76,11 +102,13 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     //Check if the Screen is Smalll for size Adjustment
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
     //Calculation of the Button Size based on Screen Size
-    final double buttonSize = isSmallScreen? 40 : 60; // Adjust size proportionally
+    final double buttonSize =
+        isSmallScreen ? 40 : 60; // Adjust size proportionally
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea( //helps to avoid overlapping with the notch, holes, or rounded corners of a device's screen
+      body: SafeArea(
+        //helps to avoid overlapping with the notch, holes, or rounded corners of a device's screen
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -110,18 +138,36 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               Row(
                 children: [
                   ...List.generate(
-                    demo_data.length, 
+                    demo_data.length,
                     (index) => Padding(
                       padding: EdgeInsets.only(right: 4.0),
                       child: DotIndicator(isActive: index == _PageIndex),
                     ),
-                ),
+                  ),
                   const Spacer(),
                   SizedBox(
                     height: buttonSize,
                     width: buttonSize,
                     child: ElevatedButton(
-                      onPressed: _onNextPressed,
+                      onPressed: () async {
+                        if (_PageIndex == demo_data.length - 1) {
+                          final prefs = await SharedPreferences.getInstance();
+                          //sets the onboarding to true
+                          await prefs.setBool('onboardingComplete', true);
+                          print(prefs.getBool('onBoardingComplete'));
+                          // Navigate to the Home screen
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const _LoginScreen()),
+                          );
+                        } else {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.ease,
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
                         padding: EdgeInsets.zero,
@@ -157,9 +203,10 @@ class DotIndicator extends StatelessWidget {
         height: isActive ? 12 : 4,
         width: 4,
         decoration: BoxDecoration(
-          color: isActive ? Color(0xff088294) : Color(0xff088294).withOpacity(0.4),
+          color:
+              isActive ? Color(0xff088294) : Color(0xff088294).withOpacity(0.4),
           borderRadius: const BorderRadius.all(Radius.circular(12)),
-          ));
+        ));
   }
 }
 
@@ -257,44 +304,41 @@ class OnBoardContent extends StatelessWidget {
 
 int _index = 0;
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class _LoginScreen extends StatelessWidget {
+  const _LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Builder(
-          builder: (context) {
-            final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
+    return Scaffold(
+      body: Builder(
+        builder: (context) {
+          final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
 
-            return Center(
-              child: isSmallScreen
-                  ? Column(
-                      mainAxisSize: MainAxisSize.min,
+          return Center(
+            child: isSmallScreen
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _Logo(),
+                      LoginScreen(), // Use the LoginScreen widget here
+                    ],
+                  )
+                : Container(
+                    padding: const EdgeInsets.all(32.0),
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: Row(
                       children: [
-                        _Logo(),
-                        LoginScreen(), // Use the LoginScreen widget here
+                        const Expanded(child: _Logo()),
+                        Expanded(
+                          child: Center(
+                              child:
+                                  LoginScreen()), // Use the LoginScreen widget here
+                        ),
                       ],
-                    )
-                  : Container(
-                      padding: const EdgeInsets.all(32.0),
-                      constraints: const BoxConstraints(maxWidth: 800),
-                      child: Row(
-                        children: [
-                          const Expanded(child: _Logo()),
-                          Expanded(
-                            child: Center(
-                                child:
-                                    LoginScreen()), // Use the LoginScreen widget here
-                          ),
-                        ],
-                      ),
                     ),
-            );
-          },
-        ),
+                  ),
+          );
+        },
       ),
     );
   }
@@ -365,17 +409,21 @@ Widget _drawer(BuildContext context) => Drawer(
           int itemIndex = _menuItems.indexWhere((_item) => _item == item);
           return Container(
             decoration: BoxDecoration(
-              color: _index == itemIndex ? const Color(0xff095f6f) : Colors.transparent,
-              borderRadius: const BorderRadius.only(topRight: Radius.circular(10.0), bottomRight: Radius.circular(40.0)),
+              color: _index == itemIndex
+                  ? const Color(0xff095f6f)
+                  : Colors.transparent,
+              borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(10.0),
+                  bottomRight: Radius.circular(40.0)),
             ),
             child: ListTile(
               leading: Icon(icon, color: Colors.white),
               onTap: () {
                 _index = itemIndex;
                 Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Panel()),
-                  (route) => false);
+                    context,
+                    MaterialPageRoute(builder: (context) => const Panel()),
+                    (route) => false);
               },
               title: Text(item,
                   style: const TextStyle(
@@ -388,27 +436,30 @@ Widget _drawer(BuildContext context) => Drawer(
       ),
     );
 
-
 Widget _navBarItems(BuildContext context) => Row(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: _menuItems
           .map(
-
             (item) => Material(
-              color: _index == _menuItems.indexWhere((_item) => _item == item) ? const Color(0xff095f6f) : Colors.transparent, // Set your desired background color here
-              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(35.0), bottomRight: Radius.circular(35.0)),
+              color: _index == _menuItems.indexWhere((_item) => _item == item)
+                  ? const Color(0xff095f6f)
+                  : Colors
+                      .transparent, // Set your desired background color here
+              borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(35.0),
+                  bottomRight: Radius.circular(35.0)),
               child: InkWell(
                 onTap: () {
                   _index = _menuItems.indexWhere((_item) => _item == item);
                   Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => Panel()),
+                      MaterialPageRoute(builder: (context) => Panel()),
                       (route) => false);
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 24.0, horizontal: 16),
                   child: Text(
                     item,
                     style: const TextStyle(
@@ -416,14 +467,12 @@ Widget _navBarItems(BuildContext context) => Row(
                       fontFamily: 'Montserrat',
                     ),
                   ),
-
                 ),
               ),
             ),
           )
           .toList(),
     );
-
 
 class Logout extends StatelessWidget {
   const Logout({super.key});
@@ -446,7 +495,7 @@ class Logout extends StatelessWidget {
             Navigator.of(context).pop();
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const Home()),
+              MaterialPageRoute(builder: (context) => const _LoginScreen()),
             );
           },
         ),
@@ -584,7 +633,8 @@ class PanelState extends State<Panel> {
             actions: const [
               Padding(
                 padding: EdgeInsets.only(right: 16.0),
-                child: CircleAvatar(child: _ProfileIcon(), backgroundColor: Color(0xff024c56)),
+                child: CircleAvatar(
+                    child: _ProfileIcon(), backgroundColor: Color(0xff024c56)),
               )
             ],
           ),
@@ -641,17 +691,21 @@ class Dashboard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Center(
-                    child: DashboardCounter(title: "Latest Fish Kill", countName: "Fish Kill", path: Uri.https(
-                      'save2wo-api.vercel.app','/history/fish-kill/latest'
-                    ),icon: FontAwesomeIcons.clockRotateLeft
-                    ),
+                    child: DashboardCounter(
+                        title: "Latest Fish Kill",
+                        countName: "Fish Kill",
+                        path: Uri.https('save2wo-api.vercel.app',
+                            '/history/fish-kill/latest'),
+                        icon: FontAwesomeIcons.clockRotateLeft),
                   ),
                   const SizedBox(width: 16),
                   Center(
-                    child: DashboardCounter(title: "Total Fish Kill", countName: "Fish Kill", path: Uri.https(
-                      'save2wo-api.vercel.app','/history/fish-kill/total'
-                    ),
-                    icon: FontAwesomeIcons.chartPie,
+                    child: DashboardCounter(
+                      title: "Total Fish Kill",
+                      countName: "Fish Kill",
+                      path: Uri.https(
+                          'save2wo-api.vercel.app', '/history/fish-kill/total'),
+                      icon: FontAwesomeIcons.chartPie,
                     ),
                   ),
                 ],
@@ -678,7 +732,6 @@ class ProfileTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        
         backgroundColor: const Color(0xff088294),
         title: const Text(
           'Profile',
@@ -688,12 +741,11 @@ class ProfileTab extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, Color.fromARGB(255, 240,244,244)],
+            colors: [Colors.white, Color.fromARGB(255, 240, 244, 244)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -702,7 +754,7 @@ class ProfileTab extends StatelessWidget {
         child: Center(
           child: Card(
             elevation: 8,
-            color:Color(0xff108494),
+            color: Color(0xff108494),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -743,7 +795,10 @@ class ProfileTab extends StatelessWidget {
                   ),
                   SizedBox(height: 16),
                   ElevatedButton(
-                    child: Text('Edit Profile', style: TextStyle(fontSize: 15),),
+                    child: Text(
+                      'Edit Profile',
+                      style: TextStyle(fontSize: 15),
+                    ),
                     onPressed: () {
                       // Handle Edit Profile action
                     },
@@ -772,13 +827,12 @@ class DashboardCounter extends StatefulWidget {
   final String title;
   final Uri path;
   final IconData icon;
-  const DashboardCounter({
-    super.key,
-    required this.countName,
-    required this.title,
-    required this.path,
-    required this.icon
-  });
+  const DashboardCounter(
+      {super.key,
+      required this.countName,
+      required this.title,
+      required this.path,
+      required this.icon});
   @override
   StateDashboardCounter createState() => StateDashboardCounter();
 }
@@ -810,8 +864,7 @@ class StateDashboardCounter extends State<DashboardCounter> {
       count: snapshot.data?.deadFish ?? 0,
       countName: widget.countName,
       title: widget.title,
-      icon: widget.icon
-      );
+      icon: widget.icon);
 
   @override
   Widget build(BuildContext context) {
@@ -820,7 +873,11 @@ class StateDashboardCounter extends State<DashboardCounter> {
       future: history,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const LoadingCard(
+              height: 256,
+              width: 373,
+              scale: Scale(
+                  heightPercent: 0.22107829534, widthPercent: 0.39194324358));
         } else if (snapshot.connectionState == ConnectionState.none) {
           return Container();
         } else {
