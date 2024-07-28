@@ -10,10 +10,33 @@ import 'package:http/http.dart' as http;
 import 'package:save2woproj/data/login.dart';
 import 'package:save2woproj/data/changepassword.dart';
 import 'package:save2woproj/model/globals.dart' as global;
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const DevMode());
+Future<void> main() async {
+  // Ensure Flutter framework is initialized
+  WidgetsFlutterBinding.ensureInitialized();
+  // Perform any asynchronous operations here
+  final prefs = await SharedPreferences.getInstance();
+  bool? onboardingComplete = prefs.getBool('onboardingComplete');
+
+  runApp(MyApp(onboardingComplete: onboardingComplete ?? false));
 }
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key,required this.onboardingComplete});
+final bool onboardingComplete;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'save2wo',
+      debugShowCheckedModeBanner: false,
+      home: onboardingComplete ? const _LoginScreen() : const OnBoardingScreen(),
+    );
+  }
+}
+
+
 
 // For development purposes
 class DevMode extends StatelessWidget {
@@ -57,11 +80,15 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   }
 
   //Function for button Press
-  void _onNextPressed() {
+  void _onNextPressed() async {
     if (_PageIndex == demo_data.length - 1) {
+      final prefs = await SharedPreferences.getInstance();
+      //sets the onboarding to true
+      prefs.setBool('onboardingComplete', true);
+      print(prefs.getBool('onBoardingComplete'));
       // Navigate to the Home screen
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const Home()),
+        MaterialPageRoute(builder: (context) => const _LoginScreen()),
       );
     } else {
       _pageController.nextPage(
@@ -123,7 +150,25 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     height: buttonSize,
                     width: buttonSize,
                     child: ElevatedButton(
-                      onPressed: _onNextPressed,
+                      onPressed: () async {
+                        if (_PageIndex == demo_data.length - 1) {
+                          final prefs = await SharedPreferences.getInstance();
+                          //sets the onboarding to true
+                          await prefs.setBool('onboardingComplete', true);
+                          print(prefs.getBool('onBoardingComplete'));
+                          // Navigate to the Home screen
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const _LoginScreen()),
+                          );
+                        } else {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.ease,
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
                         padding: EdgeInsets.zero,
@@ -260,44 +305,41 @@ class OnBoardContent extends StatelessWidget {
 
 int _index = 0;
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class _LoginScreen extends StatelessWidget {
+  const _LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Builder(
-          builder: (context) {
-            final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
+    return Scaffold(
+      body: Builder(
+        builder: (context) {
+          final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
 
-            return Center(
-              child: isSmallScreen
-                  ? Column(
-                      mainAxisSize: MainAxisSize.min,
+          return Center(
+            child: isSmallScreen
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _Logo(),
+                      LoginScreen(), // Use the LoginScreen widget here
+                    ],
+                  )
+                : Container(
+                    padding: const EdgeInsets.all(32.0),
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: Row(
                       children: [
-                        _Logo(),
-                        LoginScreen(), // Use the LoginScreen widget here
+                        const Expanded(child: _Logo()),
+                        Expanded(
+                          child: Center(
+                              child:
+                                  LoginScreen()), // Use the LoginScreen widget here
+                        ),
                       ],
-                    )
-                  : Container(
-                      padding: const EdgeInsets.all(32.0),
-                      constraints: const BoxConstraints(maxWidth: 800),
-                      child: Row(
-                        children: [
-                          const Expanded(child: _Logo()),
-                          Expanded(
-                            child: Center(
-                                child:
-                                    LoginScreen()), // Use the LoginScreen widget here
-                          ),
-                        ],
-                      ),
                     ),
-            );
-          },
-        ),
+                  ),
+          );
+        },
       ),
     );
   }
@@ -454,7 +496,7 @@ class Logout extends StatelessWidget {
             Navigator.of(context).pop();
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const Home()),
+              MaterialPageRoute(builder: (context) => const _LoginScreen()),
             );
           },
         ),
@@ -657,17 +699,21 @@ class Dashboard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Center(
-                    child: DashboardCounter(title: "Latest Fish Kill", countName: "Fish Kill", path: Uri.https(
-                      'save2wo-api.vercel.app','/history/fish-kill/latest'
-                    ),icon: FontAwesomeIcons.clockRotateLeft
-                    ),
+                    child: DashboardCounter(
+                        title: "Latest Fish Kill",
+                        countName: "Fish Kill",
+                        path: Uri.https('save2wo-api.vercel.app',
+                            '/history/fish-kill/latest'),
+                        icon: FontAwesomeIcons.clockRotateLeft),
                   ),
                   const SizedBox(width: 16),
                   Center(
-                    child: DashboardCounter(title: "Total Fish Kill", countName: "Fish Kill", path: Uri.https(
-                      'save2wo-api.vercel.app','/history/fish-kill/total'
-                    ),
-                    icon: FontAwesomeIcons.chartPie,
+                    child: DashboardCounter(
+                      title: "Total Fish Kill",
+                      countName: "Fish Kill",
+                      path: Uri.https(
+                          'save2wo-api.vercel.app', '/history/fish-kill/total'),
+                      icon: FontAwesomeIcons.chartPie,
                     ),
                   ),
                 ],
@@ -789,13 +835,12 @@ class DashboardCounter extends StatefulWidget {
   final String title;
   final Uri path;
   final IconData icon;
-  const DashboardCounter({
-    super.key,
-    required this.countName,
-    required this.title,
-    required this.path,
-    required this.icon
-  });
+  const DashboardCounter(
+      {super.key,
+      required this.countName,
+      required this.title,
+      required this.path,
+      required this.icon});
   @override
   StateDashboardCounter createState() => StateDashboardCounter();
 }
@@ -827,8 +872,7 @@ class StateDashboardCounter extends State<DashboardCounter> {
       count: snapshot.data?.deadFish ?? 0,
       countName: widget.countName,
       title: widget.title,
-      icon: widget.icon
-      );
+      icon: widget.icon);
 
   @override
   Widget build(BuildContext context) {
@@ -837,7 +881,11 @@ class StateDashboardCounter extends State<DashboardCounter> {
       future: history,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const LoadingCard(
+              height: 256,
+              width: 373,
+              scale: Scale(
+                  heightPercent: 0.22107829534, widthPercent: 0.39194324358));
         } else if (snapshot.connectionState == ConnectionState.none) {
           return Container();
         } else {

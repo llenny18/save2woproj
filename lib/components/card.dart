@@ -310,7 +310,6 @@ class StateCounterCard extends State<CounterCard> {
   @override
   Widget build(BuildContext context) {
     final count = widget.count;
-    final countName = widget.countName;
     final title = widget.title;
     final icon = widget.icon;
     Size size = MediaQuery.of(context).size;
@@ -394,4 +393,57 @@ class ScaleSize {
     double val = (width / 1400) * maxTextScaleFactor;
     return max(1, min(val, maxTextScaleFactor));
   }
+}
+
+
+
+
+
+
+class LoadingCard extends StatelessWidget{
+  const LoadingCard({
+    super.key,
+    required this.width,
+    required this.height,
+    required this.scale,
+    this.padding,
+    this.removeRadius
+    });
+
+  final double width;
+  final double height;
+  final Scale scale;
+  final double? padding;
+  final bool? removeRadius;
+  @override
+  Widget build(BuildContext context){
+    Size size = MediaQuery.of(context).size;
+    bool isSmallScreen = size.width < 800;
+    final double _padding = padding ?? 13.0;
+    final bool _removeRadius = removeRadius ?? false;
+    final double radius = _removeRadius ? 0 : 13;
+    return Padding(
+      padding: EdgeInsets.all(_padding),
+      child: Container(
+        decoration:  BoxDecoration(
+          color:const  Color(0xff95a5a6),
+          borderRadius:  BorderRadius.all(Radius.circular(radius)),
+        ),
+        
+          width: isSmallScreen ? size.width * scale.widthPercent : width,
+          height: isSmallScreen ? size.height * scale.heightPercent : height,
+        
+      ),
+    );
+  }
+}
+
+class Scale{
+  final double widthPercent;
+  final double heightPercent;
+
+  const Scale({
+    required this.heightPercent,
+    required this.widthPercent
+  });
 }

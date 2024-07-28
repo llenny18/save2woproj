@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:save2woproj/components/table.dart';
 import 'package:save2woproj/model/model.dart';
 import 'package:http/http.dart' as http;
+import 'package:save2woproj/components/card.dart';
 import 'dart:convert';
 
 
@@ -92,11 +93,12 @@ Widget buildLinear(value) => LinearProgressIndicator(
   Widget buildDataWidget(context,snapshot,rows)=> ListDataTable(columns: columns, rows: rows);
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
    return FutureBuilder<List<History>?>(
       future: history,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return LoadingCard(width: size.width ,height: size.height, scale: const Scale(heightPercent: 1,widthPercent: 1),padding: 0,removeRadius: true,);
         } else if (snapshot.connectionState == ConnectionState.none) {
           return Container();
         } else {
